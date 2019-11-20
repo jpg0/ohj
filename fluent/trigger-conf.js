@@ -1,11 +1,11 @@
-const triggers = require('triggers');
+const triggers = require('../triggers');
 const log = require('../log')('trigger-conf');
 
 class CronTriggerConfig {
     constructor(timeStr) {
         this.timeStr = timeStr;
         this._complete = () => true
-        this._toOHTriggers = () => [triggers.TimerTrigger(this.timeStr)]
+        this._toOHTriggers = () => [triggers.GenericCronTrigger(this.timeStr)]
         this.describe = () => `matches cron "${this.timeStr}"`
     }
 };
@@ -74,11 +74,11 @@ class ItemTriggerConfig {
     _toOHTriggers() {
         switch (this.op_type) {
             case "changed":
-                return [triggers.ChangedEventTrigger(this.item_name, undefined, this.to_value)];
+                return [triggers.ItemStateChangeTrigger(this.item_name, undefined, this.to_value)];
             case 'receivedCommand':
-                return [triggers.CommandEventTrigger(this.item_name, this.to_value)]
+                return [triggers.ItemCommandTrigger(this.item_name, this.to_value)]
             case 'receivedUpdate':
-                return [triggers.UpdatedEventTrigger(this.item_name, this.to_value)]
+                return [triggers.ItemStateUpdateTrigger(this.item_name, this.to_value)]
             default:
                 throw error("Unknown operation type: " + this.op_type);
         }

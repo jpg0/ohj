@@ -14,6 +14,9 @@ try {
     RuleManager = osgi.get_service("org.eclipse.smarthome.automation.RuleManager")
 }
 
+scriptExtension.importPreset("RuleSupport");
+//^ this ensures we have 'automationManager'
+
 const itemNameForRule = function (ruleConfig) {
     return "vRuleItemFor" + ohitems.safeItemName(ruleConfig.name);
 }
@@ -144,7 +147,7 @@ const getTriggeredData = function (input) {
     };
 
     try {
-        if (event.getPayload()) {
+        if (event !== null && event.getPayload()) {
             d.payload = JSON.parse(event.getPayload());
         }
     } catch (e) {

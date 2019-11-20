@@ -1,4 +1,4 @@
-const LOGGER_PREFIX = "org.eclipse.smarthome.model.script.jsr223.javascript";
+const LOGGER_PREFIX = "script.js";
 
 class Logger {
     constructor(_name, _listener) {

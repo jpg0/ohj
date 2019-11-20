@@ -1,6 +1,7 @@
 const osgi = require('./osgi');
 const utils = require('./utils');
 const log = require('./log')('items');
+const metadata = require('./metadata');
 
 const itemBuilderFactory = osgi.get_service(
     "org.openhab.core.items.ItemBuilderFactory"
@@ -58,6 +59,10 @@ class OHItem {
         } else {
             return false;
         }
+    }
+
+    getMetadataValue(namespace) {
+        return metadata.getMetadataValue(this.name, namespace);
     }
 
     sendCommandIfDifferent(value) {

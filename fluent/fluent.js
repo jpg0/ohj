@@ -83,6 +83,7 @@ class FluentRule {
             ruleGroup: optionalRuleGroup,
             execute: function (data) {
                     fnToExecute(data);
+                log.info("executed.")
             }
         });
     }
