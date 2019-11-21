@@ -12,7 +12,7 @@ This library aims to be a fairly high-level ES6 library to support automation in
 - Install the Openhab 'Experimental Rule Engine' in Paper UI
 - Install the GraalJS bundle to upgrade JS runtime to ES6
 - Ensure that you have created the automation scripting directories
-- Change directory to the javascript community lib directory: `cd $OPENHAB_CONF/automation/lib/javascript/community`
+- Go to the javascript community lib directory: `cd $OPENHAB_CONF/automation/lib/javascript/community`
 - `npm i ohj`
 
 ## Usage
