@@ -37,6 +37,9 @@ The cleanest way to use the API is with a `with` statement. This is so that it's
 without a prefix. An alternative approach (to allow `'use strict'`) would be to explicitly import the functions that you
 use, such as `const {when, then} = require('ohj').fluent`. The following examples will use the `with` style of importing.
 
+Note that for the `timeOfDay` API, you must create a `vTimeOfDay` String item, which is updated like in [the Openhab pattern](https://community.openhab.org/t/design-pattern-time-of-day/15407). A future release will check this.
+
+
 ## Fluent Examples
 
 ```
