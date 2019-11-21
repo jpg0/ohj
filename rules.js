@@ -6,6 +6,7 @@ const utils = require('./utils');
 const log = require('./log')('rules');
 const itemhistory = require('./itemhistory');
 const osgi = require('./osgi');
+const triggers = require('./triggers');
 
 let RuleManager = null;
 try {
@@ -26,7 +27,7 @@ const linkItemToRule = function (rule, item) {
         name: "vProxyRuleFor" + rule.getName(),
         description: "Generated Rule to toggle real rule for " + rule.getName(),
         triggers: [
-            require('triggers').ItemStateUpdateTrigger(item.name)
+            triggers.ItemStateUpdateTrigger(item.name)
         ],
         execute: function (data) {
             try {
