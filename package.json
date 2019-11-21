@@ -2,7 +2,7 @@
     "name": "ohj",
     "version": "0.0.1",
     "description": "JavaScript Library for Openhan",
-    "private": true,
+    "private": false,
     "dependencies": {
         "cronstrue": "^1.84.0",
         "mocha": "^6.2.2",
