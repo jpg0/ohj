@@ -9,7 +9,7 @@ This library aims to be a fairly high-level ES6 library to support automation in
 
 ## Installation
 
-- Install the Openhab Nextgen Rules Engine
+- Install the Openhab 'Experimental Rule Engine' in Paper UI
 - Install the GraalJS bundle to upgrade JS runtime to ES6
 - Ensure that you have created the automation scripting directories
 - Change directory to the javascript community lib directory: `cd $OPENHAB_CONF/automation/lib/javascript/community`
