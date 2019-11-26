@@ -66,9 +66,9 @@ exports.JSRule = function (obj) {
         }
     };
 
-    var rule = new SimpleRule(){
+    var rule = new SimpleRule({
         execute: doExecute
-    };
+    });
 
     var triggers = obj.triggers ? obj.triggers : obj.getEventTrigger();
 

@@ -14,7 +14,8 @@
     },
     "scripts": {
         "test": "mocha",
-        "docs": "./node_modules/.bin/jsdoc --configure docs_config.json"
+        "docs": "./node_modules/.bin/jsdoc --configure docs_config.json",
+        "deploy": "npm test && npm run docs"
     },
     "devDependencies": {
         "jsdoc": "^3.6.3",
