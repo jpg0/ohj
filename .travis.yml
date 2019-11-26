@@ -1,12 +1,12 @@
 language: node_js
 node_js:
-- '5'
-- '4'
-- '0.12'
-- '0.10'
+- '10'
 script: npm test
-after_success: bash ./deploy_docs.sh
-env:
-  global:
-    - ENCRYPTION_LABEL: 3985cea5a61f
-    - COMMIT_AUTHOR_EMAIL: openapi@bandwidth.com
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $DEPLOY_TOKEN
+  keep_history: true
+  on:
+    branch: master
+  local_dir: out
