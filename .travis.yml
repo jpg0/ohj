@@ -4,7 +4,6 @@ node_js:
 script: npm run deploy
 deploy:
   provider: pages
-  repo: jpg0/jpg0.github.io
   skip_cleanup: true
   github_token: $DEPLOY_TOKEN
   keep_history: true
