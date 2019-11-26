@@ -67,6 +67,9 @@ exports.typeWithFallback = function(type, fallbackType) {
     let rv;
     try {
         rv = Java.type(type);
+        if (rv === null) {
+            throw error("not found");
+        }
     } catch(e) {
         rv = Java.type(fallbackType);
     }

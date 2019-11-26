@@ -1,5 +1,5 @@
 const parse_duration = require('parse-duration');
-const log = require('../log').log('operation-conf');
+const log = require('../log')('operation-conf');
 const ohitems = require('../items');
 
 class CopyStateOperation {
@@ -107,8 +107,6 @@ class ToggleOperation {
 
     doToggle(){
         let item = ohitems.getItem(this.itemName);
-
-        log.error(`s=${typeof item.rawState.getBrightness()} ${'0' != item.rawState.getBrightness().toString()}`);
 
         switch(item.type) {
             case "SwitchItem": {

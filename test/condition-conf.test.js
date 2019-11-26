@@ -6,13 +6,14 @@ describe('Conditionals', function () {
     const createLogMock = () => {
         let messages = [];
     
-        return { messages, mock:{
-            log: function(name){
+        return { 
+            messages, 
+            mock:function(name){
                 return {
                     error: a => messages.push(a)
                 }
             }
-        }}
+        };
     }
 
     function itemMock(nameToState) {

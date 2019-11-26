@@ -1,4 +1,4 @@
-const log = require('../log').log('condition-conf')
+const log = require('../log')('condition-conf')
 const ohitems = require('../items')
 
 class FunctionConditionConf {

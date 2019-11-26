@@ -1,5 +1,5 @@
 const triggers = require('../triggers');
-const log = require('../log').log('trigger-conf');
+const log = require('../log')('trigger-conf');
 
 class CronTriggerConfig {
     constructor(timeStr) {
@@ -87,7 +87,7 @@ class ItemTriggerConfig {
     _executeHook() {
 
         const getReceivedCommand = function(args){
-            return args.input.get('command');
+            return args.receivedCommand;
         };
 
         if(this.op_type === 'receivedCommand') { //add the received command as 'it'

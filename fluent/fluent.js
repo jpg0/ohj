@@ -1,4 +1,4 @@
-const log = require('log').Logger('fluent');
+const log = require('../log')('fluent');
 const ohitems = require('../items');
 const rules = require('../rules');
 
@@ -83,7 +83,6 @@ class FluentRule {
             ruleGroup: optionalRuleGroup,
             execute: function (data) {
                     fnToExecute(data);
-                log.info("executed.")
             }
         });
     }

@@ -1,11 +1,8 @@
 const utils = require('./utils');
 
-let ModuleBuilder;
-    try {
-        ModuleBuilder = Java.type("org.eclipse.smarthome.automation.core.util.ModuleBuilder");
-    } catch(e) {
-        ModuleBuilder = Java.type("org.openhab.core.automation.util.ModuleBuilder");
-    }
+let ModuleBuilder = utils.typeWithFallback(
+    "org.eclipse.smarthome.automation.core.util.ModuleBuilder",
+    "org.openhab.core.automation.util.ModuleBuilder");
 
 let Configuration = Java.type("org.eclipse.smarthome.config.core.Configuration");
 

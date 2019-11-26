@@ -1,4 +1,4 @@
-const ohitems = require('./items');
+const items = require('./items');
 
 const PersistenceExtensions = Java.type("org.eclipse.smarthome.model.persistence.extensions.PersistenceExtensions");
 
