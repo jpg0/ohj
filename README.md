@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/jpg0/ohj.svg?branch=master)](https://travis-ci.org/jpg0/ohj)
 # Openhab Javascript Library
 
 This library aims to be a fairly high-level ES6 library to support automation in Openhab.
