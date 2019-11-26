@@ -1,5 +1,5 @@
 const parse_duration = require('parse-duration');
-const log = require('log').Logger('operation-conf');
+const log = require('../log').log('operation-conf');
 const ohitems = require('../items');
 
 class CopyStateOperation {

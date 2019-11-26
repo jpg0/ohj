@@ -7,7 +7,7 @@ describe('Operations', function () {
         let messages = [];
     
         return { messages, mock:{
-            Logger: function(name){
+            log: function(name){
                 return {
                     error: a => messages.push(a)
                 }
@@ -26,9 +26,9 @@ describe('Operations', function () {
     describe('Copy State Operation', function () {
         it('Should copy state via send when everything set up correctly', function (done) {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return {
                             state: "test1"
@@ -53,9 +53,9 @@ describe('Operations', function () {
 
         it('Should copy state via update when everything set up correctly', function (done) {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return {
                             state: "test1"
@@ -80,9 +80,9 @@ describe('Operations', function () {
 
         it('Should copy null state', function (done) {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return {
                             state: null
@@ -107,9 +107,9 @@ describe('Operations', function () {
 
         it('Should disallow omission of to item', function () {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return {
                             state: "test1"
@@ -133,9 +133,9 @@ describe('Operations', function () {
 
         it('Should disallow omission of from item', function () {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return {
                             state: "test1"
@@ -159,9 +159,9 @@ describe('Operations', function () {
 
         it('Should disallow omission of both items', function () {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return {
                             state: "test1"
@@ -185,9 +185,9 @@ describe('Operations', function () {
 
         it('Should tell you if from item doesnt exist', function () {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return undefined;
                     } else if(name == 'item2') {
@@ -205,9 +205,9 @@ describe('Operations', function () {
 
         it('Should tell you if to item doesnt exist', function () {
 
-            const operation_conf = proxyquire('../operation-conf',  {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const operation_conf = proxyquire('../fluent/operation-conf',  {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     if(name == 'item1') {
                         return {};
                     } else if(name == 'item2') {

@@ -7,7 +7,7 @@ describe('Conditionals', function () {
         let messages = [];
     
         return { messages, mock:{
-            Logger: function(name){
+            log: function(name){
                 return {
                     error: a => messages.push(a)
                 }
@@ -26,9 +26,9 @@ describe('Conditionals', function () {
     describe('Function Conditions', function () {
         it('Should pass when the function returns true', function () {
 
-            const condition_conf = proxyquire('../condition-conf', {
-                'log': createLogMock().mock,
-                'im': itemMock()
+            const condition_conf = proxyquire('../fluent/condition-conf', {
+                '../log': createLogMock().mock,
+                '../items': itemMock()
               });
 
             let conf = new condition_conf.FunctionConditionConf(() => true);
@@ -37,9 +37,9 @@ describe('Conditionals', function () {
 
         it('Should not pass when the function returns false', function () {
 
-            const condition_conf = proxyquire('../condition-conf', {
-                'log': createLogMock().mock,
-                'im': itemMock()
+            const condition_conf = proxyquire('../fluent/condition-conf', {
+                '../log': createLogMock().mock,
+                '../items': itemMock()
               });
 
             let conf = new condition_conf.FunctionConditionConf(() => false);
@@ -50,9 +50,9 @@ describe('Conditionals', function () {
     describe('Item Conditions', function () {
         it('Should pass when the item state matches', function () {
 
-            const condition_conf = proxyquire('../condition-conf', {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const condition_conf = proxyquire('../fluent/condition-conf', {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     assert.strictEqual(name, 'myitem');
                       return {
                           state: "mystate"
@@ -67,9 +67,9 @@ describe('Conditionals', function () {
 
         it('Should not pass when the item state doesnt matches', function () {
             
-            const condition_conf = proxyquire('../condition-conf', {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const condition_conf = proxyquire('../fluent/condition-conf', {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     assert.strictEqual(name, 'myitem');
                       return {
                           state: "mystate2"
@@ -84,9 +84,9 @@ describe('Conditionals', function () {
 
         it('Should not pass when the item doesnt exist', function () {
             
-            const condition_conf = proxyquire('../condition-conf', {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const condition_conf = proxyquire('../fluent/condition-conf', {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     assert.strictEqual(name, 'myitem');
                     return undefined;
                 })
@@ -99,9 +99,9 @@ describe('Conditionals', function () {
 
         it('Should not pass when the item is null', function () {
 
-            const condition_conf = proxyquire('../condition-conf', {
-                'log': createLogMock().mock,
-                'im': itemMock((name) => {
+            const condition_conf = proxyquire('../fluent/condition-conf', {
+                '../log': createLogMock().mock,
+                '../items': itemMock((name) => {
                     assert.strictEqual(name, 'myitem');
                     return null;
                 })

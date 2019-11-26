@@ -1,5 +1,5 @@
 const triggers = require('../triggers');
-const log = require('../log')('trigger-conf');
+const log = require('../log').log('trigger-conf');
 
 class CronTriggerConfig {
     constructor(timeStr) {
