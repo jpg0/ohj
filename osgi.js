@@ -1,7 +1,7 @@
 
 const FrameworkUtil = Java.type("org.osgi.framework.FrameworkUtil");
 
-const _bundle = FrameworkUtil.getBundle(scriptExtension.getClass());
+const _bundle = FrameworkUtil.getBundle(Java.type("org.openhab.core.automation.module.script.ScriptExtensionProvider"));
 
 const bundle_context = (_bundle !== null) ? _bundle.getBundleContext() : null;
 const registered_services = [];

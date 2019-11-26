@@ -7,6 +7,7 @@ const log = require('./log')('rules');
 const itemhistory = require('./itemhistory');
 const osgi = require('./osgi');
 const triggers = require('./triggers');
+const automationManager = require('@runtime/RuleSupport').automationManager;
 
 let RuleManager = null;
 try {
@@ -14,9 +15,6 @@ try {
 } catch(e) {
     RuleManager = osgi.get_service("org.eclipse.smarthome.automation.RuleManager")
 }
-
-scriptExtension.importPreset("RuleSupport");
-//^ this ensures we have 'automationManager'
 
 const itemNameForRule = function (ruleConfig) {
     return "vRuleItemFor" + ohitems.safeItemName(ruleConfig.name);
@@ -117,7 +115,7 @@ exports.SwitchableJSRule = function (ruleConfig) {
         if (historicState !== null) {
             item.postUpdate(historicState);
         } else {
-            item.sendCommand(ON);
+            item.sendCommand('ON');
         }
     }
 }

@@ -62,3 +62,13 @@ exports.dumpObject = function (obj) {
         log.info("Failed to dump object: " + e.message);
     }
 }
+
+exports.typeWithFallback = function(type, fallbackType) {
+    let rv;
+    try {
+        rv = Java.type(type);
+    } catch(e) {
+        rv = Java.type(fallbackType);
+    }
+    return rv;
+}

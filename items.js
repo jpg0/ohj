@@ -2,6 +2,7 @@ const osgi = require('./osgi');
 const utils = require('./utils');
 const log = require('./log')('items');
 const metadata = require('./metadata');
+const { UnDefType, events } = require('@runtime/Defaults');
 
 const itemBuilderFactory = osgi.get_service(
     "org.openhab.core.items.ItemBuilderFactory"
@@ -15,9 +16,9 @@ const managedItemProvider = osgi.get_service(
     "org.eclipse.smarthome.core.items.ManagedItemProvider"
 )
 
-/*
-const itemRegistry = # provided by runtime #
-*/
+
+const { itemRegistry } = require('@runtime/Defaults');
+
 
 const DYNAMIC_ITEM_TAG = "_DYNAMIC_";
 
