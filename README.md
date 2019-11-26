@@ -3,6 +3,8 @@
 
 This library aims to be a fairly high-level ES6 library to support automation in Openhab.
 
+[API Documentation](https://jpg0.github.io/ohj/ohj/0.1.0/)
+
 ## Requirements
 
 - ES6 (e.g. GraalJS)
