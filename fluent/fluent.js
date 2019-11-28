@@ -1,3 +1,9 @@
+/**  
+ * Allows creation of rules in a fluent, human-readable style.
+ * 
+ * @namespace fluent
+ */
+
 const log = require('log').Logger('fluent');
 const ohitems = require('../items');
 const rules = require('../rules');
@@ -6,6 +12,9 @@ const triggers = require('./trigger-conf');
 const operations = require('./operation-conf');
 const conditions = require('./condition-conf');
 
+/**
+ * Creates rules in a fluent style.
+ */
 class FluentRule {
     constructor(triggerConf, toggleable) {
         this._triggerConfs = [];
@@ -94,18 +103,121 @@ class FluentRule {
 }
 
 const fluentExports = {
+    /**
+     * Specifies when the rule should occur.
+     * 
+     * @memberof fluent
+     * @param {ItemTriggerConfig|CronTriggerConfig} config specifies the rule triggers
+     * @returns {FluentRule} the fluent rule builder
+     */
     when: o => new FluentRule(o, true),
+
+    /**
+     * Specifies a period of day for the rule to fire. Note that this functionality depends on a 'vTimeOfDay' String item
+     * existing and being updated.
+     * 
+     * @memberof fluent
+     * @param {String} period the period, such as 'SUNSET'
+     * @returns {ItemTriggerConfig} the trigger config
+     */
     timeOfDay: s => new triggers.ItemTriggerConfig('vTimeOfDay').changed().to(s),
+    
+    /**
+     * Specifies a cron schedule for the rule to fire.
+     * 
+     * @memberof fluent
+     * @param {String} cronExpression the cron expression
+     * @returns {ItemTriggerConfig} the trigger config
+     */
     cron: s => new triggers.CronTriggerConfig(s),
+
+    /**
+     * Specifies a rule group (for toggling) that this rule should belong to.
+     * 
+     * @memberof fluent
+     * @param {String} groupName the group name
+     * @returns {*} the group config
+     */
     inGroup: g => g,
+
+    /**
+     * Specifies the a command should be sent as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @param {String} command the command to send
+     * @returns {SendCommandOperation} the operation
+     */
     send: c => new operations.SendCommandOperation(c),
+
+    /**
+     * Specifies the a command 'ON' should be sent as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
     sendOn: () => new operations.SendCommandOperation("ON"),
+
+    /**
+     * Specifies the a command 'OFF' should be sent as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
     sendOff: () => new operations.SendCommandOperation("OFF"),
+
+    /**
+     * Specifies a command should be sent to toggle the state of the target object
+     * as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
     sendToggle: () => new operations.ToggleOperation(),
+
+    /**
+     * Specifies a command should be forwarded to the state of the target object
+     * as a result of this rule firing. This relies on the trigger being the result
+     * of a command itself.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
     sendIt: () => new operations.SendCommandOperation(args => args.it, "it"),
+
+    /**
+     * Specifies an item as the source of changes to trigger a rule.
+     * 
+     * @memberof fluent
+     * @param {String} itemName the name of the item
+     * @returns {ItemTriggerConfig} the trigger config
+     */
     item: s => new triggers.ItemTriggerConfig(s),
+    
+    /**
+     * Copies the state from one item to another. Can be used to proxy item state. State is updated, not
+     * sent as a command.
+     * 
+     * @memberof fluent
+     * @returns {CopyStateOperation} the operation config
+     */
     copyState: () => new operations.CopyStateOperation(false),
+    
+    /**
+     * Sends the state from one item to another. Can be used to proxy item state. State is
+     * sent as a command.
+     * 
+     * @memberof fluent
+     * @returns {CopyStateOperation} the operation config
+     */
     copyAndSendState: () => new operations.CopyStateOperation(true),
+    
+    /**
+     * Condition of an item in determining whether to process rule.
+     * 
+     * @memberof fluent
+     * @param {String} itemName the name of the item to assess the state
+     * @returns {CopyStateOperation} the operation config
+     */
     stateOfItem: s => new conditions.ItemStateConditionConf(s)
 }
 
@@ -113,6 +225,12 @@ module.exports = Object.assign({
     when: o => new FluentRule(o, false),
 }, fluentExports);
 
+/**
+ * Switches on toggle-able rules for all items created in this namespace.
+ * 
+ * @memberof fluent
+ * @name withToggle
+ */
 module.exports.withToggle = Object.assign({
     when: o => new FluentRule(o, true),
 }, fluentExports);

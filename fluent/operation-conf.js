@@ -2,26 +2,59 @@ const parse_duration = require('parse-duration');
 const log = require('../log').log('operation-conf');
 const ohitems = require('../items');
 
+/**
+ * Copies state from one item to another item
+ * 
+ * @memberof fluent
+ * @hideconstructor
+ */
 class CopyStateOperation {
+    
+    /**
+     * Creates a new operation. Don't use constructor directly.
+     * 
+     * @param {Boolean} send whether to send (or post update) the state
+     */
     constructor(send) {
         this.send = send;
     }
 
+    /**
+     * Sets the item to copy the state from
+     * @param {String} item_name the item to copy state from
+     * @returns {CopyStateOperation} this
+     */
     fromItem(item_name){
         this.from_item = item_name;
         return this;
     }
 
+    /**
+     * Sets the item to copy the state to
+     * @param {String} item_name the item to copy state to
+     * @returns {CopyStateOperation} this
+     */
     toItem(item_name){
         this.to_item = item_name;
         return this;
     }
 
+    /**
+     * Appends another operation to execute when the rule fires
+     * @param {CopyStateOperation|SendCommandOperation|ToggleOperation} next 
+     * @returns {CopyStateOperation} this
+     */
     and(next) {
         this.next = next;
         return this;
     }
     
+    /**
+     * Runs the operation. Don't call directly.
+     * 
+     * @private
+     * @param {Object} args rule firing args
+     */
     _run(args){
 
         if(typeof this.from_item === 'undefined' || this.from_item === null) {
@@ -52,10 +85,22 @@ class CopyStateOperation {
         }
     }
 
+    /**
+     * Checks that the operation configuration is complete. Don't call directly.
+     * 
+     * @private
+     * @returns true only if the operation is ready to run
+     */
     _complete(){
         return this.from_item && this.to_item;
     }
 
+    /**
+     * Describes the operation.
+     * 
+     * @private
+     * @returns a description of the operation
+     */
     describe(){
         return `copy state from ${this.from_item} to ${this.to_item}`
     }

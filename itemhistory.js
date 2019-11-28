@@ -1,4 +1,10 @@
-const ohitems = require('./items');
+/**
+ * Items' history module.
+ * This module provides access to historic state of items.
+ * 
+ * @private
+ * @namespace itemshistory
+ */
 
 const PersistenceExtensions = Java.type("org.eclipse.smarthome.model.persistence.extensions.PersistenceExtensions");
 
