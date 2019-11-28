@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>fluent/fluent.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,95 +29,254 @@
 
 <div id="main">
     
+    <h1 class="page-title">fluent/fluent.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**  
+ * Allows creation of rules in a fluent, human-readable style.
+ * 
+ * @namespace fluent
+ */
 
+const log = require('log').Logger('fluent');
+const ohitems = require('../items');
+const rules = require('../rules');
 
+const triggers = require('./trigger-conf');
+const operations = require('./operation-conf');
+const conditions = require('./condition-conf');
 
+/**
+ * Creates rules in a fluent style.
+ */
+class FluentRule {
+    constructor(triggerConf, toggleable) {
+        this._triggerConfs = [];
+        this.toggleable = toggleable;
+        this.or(triggerConf);
+    }
 
+    or(triggerConf) {
+        if (!triggerConf._complete()) {
+            throw Error("Trigger is not complete!");
+        }
+        this._triggerConfs.push(triggerConf);
+        return this;
+    }
 
+    if(condition) {
+        if(typeof condition === 'function') {
+            condition = new conditions.FunctionConditionConf(condition);
+        }
 
+        log.debug("Setting condition on rule: {}", condition);
 
+        this.condition = condition;
+        return this;
+    }
 
+    then(operation, optionalRuleGroup) {
+        if (typeof operation === 'function') {
+            let operationFunction = operation;
+            operation = {
+                _complete: () => true,
+                _run: x => operationFunction(x),
+                describe: () => "custom function"
+            }
+        } else {
+            //first check complete
+            if (!operation._complete()) {
+                throw Error("Operation is not complete!");
+            }
+        }
 
-    
+        this.operation = operation;
+        this.optionalRuleGroup = optionalRuleGroup;
 
+        let generatedTriggers = this._triggerConfs.flatMap(x => x._toOHTriggers())
 
-    <section class="readme">
-        <article><p><a href="https://travis-ci.org/jpg0/ohj"><img src="https://travis-ci.org/jpg0/ohj.svg?branch=master" alt="Build Status"></a></p>
-<h1>Openhab Javascript Library</h1>
-<p>This library aims to be a fairly high-level ES6 library to support automation in Openhab.</p>
-<p><a href="https://jpg0.github.io/ohj/ohj/0.1.0/">API Documentation</a></p>
-<h2>Requirements</h2>
-<ul>
-<li>ES6 (e.g. GraalJS)</li>
-<li>CommonJS support</li>
-</ul>
-<h2>Installation</h2>
-<ul>
-<li>Install the Openhab 'Experimental Rule Engine' in Paper UI</li>
-<li>Install the <a href="https://openhab.jfrog.io/openhab/libs-pullrequest-local/org/openhab/addons/bundles/org.openhab.automation.module.script.graaljs/2.5.0-SNAPSHOT/org.openhab.automation.module.script.graaljs-2.5.0-SNAPSHOT.jar">GraalJS bundle</a> to upgrade JS runtime to ES6</li>
-<li>Ensure that you have created the automation scripting directories</li>
-<li>Go to the javascript community lib directory: <code>cd $OPENHAB_CONF/automation/lib/javascript/community</code></li>
-<li><code>npm i ohj</code> (you may need to install npm)</li>
-</ul>
-<h2>Usage</h2>
-<p>You should create scripts in $OPENHAB_CONF/automation/jsr223/javascript/personal.</p>
-<p>The API can be imported as a standard CommonJS module: <code>require('ohj')</code>. The ohj module itself has various sections that
-can be imported as properties of the primary import, e.g.</p>
-<pre class="prettyprint source"><code>//use destructing
-const { rules, triggers } = require('ohj');
-//or simply
-const rules = require('ohj').rules;
-</code></pre>
-<h2>Fluent API</h2>
-<p>The fluent section of the API can be used to write rules in a high-level, readable style.</p>
-<p>The cleanest way to use the API is with a <code>with</code> statement. This is so that it's possible to use the exported functions
-without a prefix. An alternative approach (to allow <code>'use strict'</code>) would be to explicitly import the functions that you
-use, such as <code>const {when, then} = require('ohj').fluent</code>. The following examples will use the <code>with</code> style of importing.</p>
-<p>Note that for the <code>timeOfDay</code> API, you must create a <code>vTimeOfDay</code> String item, which is updated like in <a href="https://community.openhab.org/t/design-pattern-time-of-day/15407">the Openhab pattern</a>. A future release will check this.</p>
-<h2>Fluent Examples</h2>
-<pre class="prettyprint source"><code>with(require('ohj').fluent){
+        const ruleClass = this.toggleable ? rules.SwitchableJSRule : rules.JSRule;
 
-    //turn on the kitchen light at SUNSET
-    when(timeOfDay(&quot;SUNSET&quot;)).then(sendOn().toItem(&quot;KitchenLight&quot;));
+        let fnToExecute = operation._run.bind(operation); //bind the function to it's instance
 
-    //turn off the kitchen light at 9PM
-    when(cron(&quot;0 0 21 * * ?&quot;)).then(sendOff().toItem(&quot;KitchenLight&quot;));
+        //chain (of responsibility for) the execute hooks
+        for(let triggerConf of this._triggerConfs) {
+            let next = fnToExecute;
+            if(typeof triggerConf._executeHook === 'function') {
+            let maybeHook = triggerConf._executeHook();
+                if(maybeHook) {
+                    let hook = maybeHook.bind(triggerConf); //bind the function to it's instance
+                    fnToExecute = function(args) {
+                        return hook(next, args);
+                    }
+                }
+            }
+        }
 
-    //set the colour of the hall light to pink at 9PM
-    when(cron(&quot;0 0 21 * * ?&quot;)).then(send(&quot;300,100,100&quot;).toItem(&quot;HallLight&quot;)
+        if(typeof this.condition !== 'undefined'){ //if conditional, check it first
+            log.debug("Adding condition to rule: {}", this.condition);
+            let fnWithoutCheck = fnToExecute;
+            fnToExecute = (x) => this.condition.check(x) &amp;&amp; fnWithoutCheck(x)
+        }
 
-    //when the switch S1 status changes to ON, then turn on the HallLight
-    when(item('S1').changed().toOn()).then(sendOn().toItem('HallLight'));
+        return ruleClass({
+            name: ohitems.safeItemName(this.describe()),
+            description: this.name,
+            triggers: generatedTriggers,
+            ruleGroup: optionalRuleGroup,
+            execute: function (data) {
+                    fnToExecute(data);
+                log.info("executed.")
+            }
+        });
+    }
 
-    //when the HallLight colour changes pink, if the function fn returns true, then toggle the state of the OutsideLight
-    when(item('HallLight').changed().to(&quot;300,100,100&quot;)).if(fn).then(sendToggle().toItem('OutsideLight'));
+    describe() {
+        return "When " + this._triggerConfs.map(t => t.describe()).join(" or ") + " then " + this.operation.describe() + (this.optionalRuleGroup ? ` (in group ${this.optionalRuleGroup})` : "");
+    }
 }
 
-//and some rules which can be toggled by the items created in the 'gRules' Group:
+const fluentExports = {
+    /**
+     * Specifies when the rule should occur.
+     * 
+     * @memberof fluent
+     * @param {ItemTriggerConfig|CronTriggerConfig} config specifies the rule triggers
+     * @returns {FluentRule} the fluent rule builder
+     */
+    when: o => new FluentRule(o, true),
 
-with(require('ohj').fluent.withToggle) {
+    /**
+     * Specifies a period of day for the rule to fire. Note that this functionality depends on a 'vTimeOfDay' String item
+     * existing and being updated.
+     * 
+     * @memberof fluent
+     * @param {String} period the period, such as 'SUNSET'
+     * @returns {ItemTriggerConfig} the trigger config
+     */
+    timeOfDay: s => new triggers.ItemTriggerConfig('vTimeOfDay').changed().to(s),
+    
+    /**
+     * Specifies a cron schedule for the rule to fire.
+     * 
+     * @memberof fluent
+     * @param {String} cronExpression the cron expression
+     * @returns {ItemTriggerConfig} the trigger config
+     */
+    cron: s => new triggers.CronTriggerConfig(s),
 
-    //when the HallLight receives a command, send the same command to the KitchenLight
-    when(item('HallLight').receivedCommand()).then(sendIt().toItem('KitchenLight'));
- 
-    //when the HallLight is updated to ON, make sure that BedroomLight1 is set to the same state as the BedroomLight2
-    when(item('HallLight').receivedUpdate()).then(copyState().fromItem('BedroomLight1').toItem('BedroomLight2'));
+    /**
+     * Specifies a rule group (for toggling) that this rule should belong to.
+     * 
+     * @memberof fluent
+     * @param {String} groupName the group name
+     * @returns {*} the group config
+     */
+    inGroup: g => g,
 
-    //when the BedroomLight1 is changed, run a custom function
-    when(item('BedroomLight1').changed()).then(() => {
-        // do stuff
-    });
+    /**
+     * Specifies the a command should be sent as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @param {String} command the command to send
+     * @returns {SendCommandOperation} the operation
+     */
+    send: c => new operations.SendCommandOperation(c),
+
+    /**
+     * Specifies the a command 'ON' should be sent as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
+    sendOn: () => new operations.SendCommandOperation("ON"),
+
+    /**
+     * Specifies the a command 'OFF' should be sent as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
+    sendOff: () => new operations.SendCommandOperation("OFF"),
+
+    /**
+     * Specifies a command should be sent to toggle the state of the target object
+     * as a result of this rule firing.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
+    sendToggle: () => new operations.ToggleOperation(),
+
+    /**
+     * Specifies a command should be forwarded to the state of the target object
+     * as a result of this rule firing. This relies on the trigger being the result
+     * of a command itself.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOperation} the operation
+     */
+    sendIt: () => new operations.SendCommandOperation(args => args.it, "it"),
+
+    /**
+     * Specifies an item as the source of changes to trigger a rule.
+     * 
+     * @memberof fluent
+     * @param {String} itemName the name of the item
+     * @returns {ItemTriggerConfig} the trigger config
+     */
+    item: s => new triggers.ItemTriggerConfig(s),
+    
+    /**
+     * Copies the state from one item to another. Can be used to proxy item state. State is updated, not
+     * sent as a command.
+     * 
+     * @memberof fluent
+     * @returns {CopyStateOperation} the operation config
+     */
+    copyState: () => new operations.CopyStateOperation(false),
+    
+    /**
+     * Sends the state from one item to another. Can be used to proxy item state. State is
+     * sent as a command.
+     * 
+     * @memberof fluent
+     * @returns {CopyStateOperation} the operation config
+     */
+    copyAndSendState: () => new operations.CopyStateOperation(true),
+    
+    /**
+     * Condition of an item in determining whether to process rule.
+     * 
+     * @memberof fluent
+     * @param {String} itemName the name of the item to assess the state
+     * @returns {CopyStateOperation} the operation config
+     */
+    stateOfItem: s => new conditions.ItemStateConditionConf(s)
 }
-</code></pre></article>
+
+module.exports = Object.assign({
+    when: o => new FluentRule(o, false),
+}, fluentExports);
+
+/**
+ * Switches on toggle-able rules for all items created in this namespace.
+ * 
+ * @memberof fluent
+ * @name withToggle
+ */
+module.exports.withToggle = Object.assign({
+    when: o => new FluentRule(o, true),
+}, fluentExports);</code></pre>
+        </article>
     </section>
-
-
 
 
 

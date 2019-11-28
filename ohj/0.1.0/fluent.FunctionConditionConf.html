@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>FunctionConditionConf - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,95 +29,191 @@
 
 <div id="main">
     
+    <h1 class="page-title">FunctionConditionConf</h1>
+    
 
     
 
 
 
+
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="fluent.html">fluent</a>~</span>
+        
+        FunctionConditionConf
+        </h2>
+        
+            <div class="class-description"><p>Condition that wraps a function to determine whether if passes</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+<div class="section-method">
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="FunctionConditionConf"><span class="type-signature"></span>new FunctionConditionConf<span class="signature">(fn)</span><span class="type-signature"></span></h4>
+
     
 
 
 
+<div class="description">
+    <p>Creates a new function condition. Don't call directly.</p>
+</div>
 
 
 
 
 
+<dl class="details">
 
     
 
+    
 
-    <section class="readme">
-        <article><p><a href="https://travis-ci.org/jpg0/ohj"><img src="https://travis-ci.org/jpg0/ohj.svg?branch=master" alt="Build Status"></a></p>
-<h1>Openhab Javascript Library</h1>
-<p>This library aims to be a fairly high-level ES6 library to support automation in Openhab.</p>
-<p><a href="https://jpg0.github.io/ohj/ohj/0.1.0/">API Documentation</a></p>
-<h2>Requirements</h2>
-<ul>
-<li>ES6 (e.g. GraalJS)</li>
-<li>CommonJS support</li>
-</ul>
-<h2>Installation</h2>
-<ul>
-<li>Install the Openhab 'Experimental Rule Engine' in Paper UI</li>
-<li>Install the <a href="https://openhab.jfrog.io/openhab/libs-pullrequest-local/org/openhab/addons/bundles/org.openhab.automation.module.script.graaljs/2.5.0-SNAPSHOT/org.openhab.automation.module.script.graaljs-2.5.0-SNAPSHOT.jar">GraalJS bundle</a> to upgrade JS runtime to ES6</li>
-<li>Ensure that you have created the automation scripting directories</li>
-<li>Go to the javascript community lib directory: <code>cd $OPENHAB_CONF/automation/lib/javascript/community</code></li>
-<li><code>npm i ohj</code> (you may need to install npm)</li>
-</ul>
-<h2>Usage</h2>
-<p>You should create scripts in $OPENHAB_CONF/automation/jsr223/javascript/personal.</p>
-<p>The API can be imported as a standard CommonJS module: <code>require('ohj')</code>. The ohj module itself has various sections that
-can be imported as properties of the primary import, e.g.</p>
-<pre class="prettyprint source"><code>//use destructing
-const { rules, triggers } = require('ohj');
-//or simply
-const rules = require('ohj').rules;
-</code></pre>
-<h2>Fluent API</h2>
-<p>The fluent section of the API can be used to write rules in a high-level, readable style.</p>
-<p>The cleanest way to use the API is with a <code>with</code> statement. This is so that it's possible to use the exported functions
-without a prefix. An alternative approach (to allow <code>'use strict'</code>) would be to explicitly import the functions that you
-use, such as <code>const {when, then} = require('ohj').fluent</code>. The following examples will use the <code>with</code> style of importing.</p>
-<p>Note that for the <code>timeOfDay</code> API, you must create a <code>vTimeOfDay</code> String item, which is updated like in <a href="https://community.openhab.org/t/design-pattern-time-of-day/15407">the Openhab pattern</a>. A future release will check this.</p>
-<h2>Fluent Examples</h2>
-<pre class="prettyprint source"><code>with(require('ohj').fluent){
+    
 
-    //turn on the kitchen light at SUNSET
-    when(timeOfDay(&quot;SUNSET&quot;)).then(sendOn().toItem(&quot;KitchenLight&quot;));
+    
 
-    //turn off the kitchen light at 9PM
-    when(cron(&quot;0 0 21 * * ?&quot;)).then(sendOff().toItem(&quot;KitchenLight&quot;));
+    
 
-    //set the colour of the hall light to pink at 9PM
-    when(cron(&quot;0 0 21 * * ?&quot;)).then(send(&quot;300,100,100&quot;).toItem(&quot;HallLight&quot;)
+    
 
-    //when the switch S1 status changes to ON, then turn on the HallLight
-    when(item('S1').changed().toOn()).then(sendOn().toItem('HallLight'));
+    
 
-    //when the HallLight colour changes pink, if the function fn returns true, then toggle the state of the OutsideLight
-    when(item('HallLight').changed().to(&quot;300,100,100&quot;)).if(fn).then(sendToggle().toItem('OutsideLight'));
-}
+    
 
-//and some rules which can be toggled by the items created in the 'gRules' Group:
+    
 
-with(require('ohj').fluent.withToggle) {
+    
 
-    //when the HallLight receives a command, send the same command to the KitchenLight
-    when(item('HallLight').receivedCommand()).then(sendIt().toItem('KitchenLight'));
- 
-    //when the HallLight is updated to ON, make sure that BedroomLight1 is set to the same state as the BedroomLight2
-    when(item('HallLight').receivedUpdate()).then(copyState().fromItem('BedroomLight1').toItem('BedroomLight2'));
+    
 
-    //when the BedroomLight1 is changed, run a custom function
-    when(item('BedroomLight1').changed()).then(() => {
-        // do stuff
-    });
-}
-</code></pre></article>
-    </section>
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fluent_condition-conf.js.html">fluent/condition-conf.js</a>, <a href="fluent_condition-conf.js.html#line15">line 15</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
 
 
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>callback which determines whether the condition passes</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

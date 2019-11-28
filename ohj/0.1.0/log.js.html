@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Home - Documentation</title>
+    <title>log.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,95 +29,199 @@
 
 <div id="main">
     
+    <h1 class="page-title">log.js</h1>
+    
 
     
 
 
 
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Log namespace.
+ * This namespace provides loggers to log messages to the Openhab Log.
+ * 
+ * @example &lt;caption>Basic logging&lt;/caption>
+ * let log = require('ohj').log('my_logger');
+ * log.info("Hello World!")
+ * 
+ * @namespace log
+ */
 
+/**
+ * Logger prefix
+ * @memberOf log
+ */
+const LOGGER_PREFIX = "script.js";
 
+/**
+ * Logger class. A named logger providing the ability to log formatted messages.
+ * 
+ * @memberof log
+ * @hideconstructor
+ */
+class Logger {
+    /**
+     * Creates a new logger. Don't use directly, use {@link log} on module.
+     * 
+     * @param {String} _name the name of the logger. Will be prefixed by {@link LOGGER_PREFIX}
+     * @param {*} _listener a callback to receive logging calls. Can be used to send calls elsewhere, such as escalate errors.
+     */
+    constructor(_name, _listener) {
+        this._name = _name || this._getCallerDetails("", 3).fileName.replace(/\.[^/.]+$/, "")
+        this._listener = _listener;
+        this._logger = Java.type("org.slf4j.LoggerFactory").getLogger(LOGGER_PREFIX + "." + this.name.toString().toLowerCase());
+    }
 
+    /**
+     * Method to determine caller. Don't use directly.
+     * 
+     * @private
+     * @param {Object} msg the message to get caller details for
+     * @param {Number} ignoreStackDepth the number of stack frames which to ignore in calculating caller
+     * @returns {Error} message as an error object, with fileName, caller and optional lineNumber properties
+     */
+    _getCallerDetails(msg, ignoreStackDepth) {
+        let stackLine = null;
 
+        if (!(msg instanceof Error)) {
+            msg = Error(msg);
+            stackLine = msg.stack.split('\n')[ignoreStackDepth];
+        } else {
+            stackLine = msg.stack.split('\n')[1];
+        }
 
+        //pick out the call, fileName &amp; lineNumber from the specific frame
+        let match = stackLine.match(/^\s+at\s*(?&lt;caller>[^ ]*) \(?(?&lt;fileName>[^:]+):(?&lt;lineNumber>[0-9]+):[0-9]+\)?/);
 
+        if (match) {
+            Object.assign(msg, match.groups);
+        } else { //won't match an 'eval'd string, so retry
+            match = stackLine.match(/\s+at\s+\&lt;eval\>:(?&lt;lineNumber>[0-9]+):[0-9]+/)
+            if (match) {
+                Object.assign(msg, {
+                    fileName: "&lt;unknown>",
+                    caller: "&lt;root script>"
+                }, match.groups)
+            } else throw Error(`Failed to parse stack line: ${stackLine}`);
+        }
 
+        return msg;
+    }
 
+    /**
+     * Method to format a log message. Don't use directly.
+     * 
+     * @private
+     * @param {Object} msg the message to get caller details for
+     * @param {String} levelString the level being logged at
+     * @param {Number} ignoreStackDepth the number of stack frames which to ignore in calculating caller
+     * @param {String} [prefix=log] the prefix type, such as none, level, short or log.
+     * @returns {Error} message with 'message' String property
+     */
+    _formatLogMessage(msg, levelString, ignoreStackDepth, prefix = "log") {
 
-    
+        let clazz = this;
+        let msgData = {
+            message: msg.toString(),
+            get caller() {//don't run this unless we need to, then cache it
+                this.cached = this.cached || clazz._getCallerDetails(msg, ignoreStackDepth)
+                return this.cached;
+            }
+        };
 
+        levelString = levelString.toUpperCase();
 
-    <section class="readme">
-        <article><p><a href="https://travis-ci.org/jpg0/ohj"><img src="https://travis-ci.org/jpg0/ohj.svg?branch=master" alt="Build Status"></a></p>
-<h1>Openhab Javascript Library</h1>
-<p>This library aims to be a fairly high-level ES6 library to support automation in Openhab.</p>
-<p><a href="https://jpg0.github.io/ohj/ohj/0.1.0/">API Documentation</a></p>
-<h2>Requirements</h2>
-<ul>
-<li>ES6 (e.g. GraalJS)</li>
-<li>CommonJS support</li>
-</ul>
-<h2>Installation</h2>
-<ul>
-<li>Install the Openhab 'Experimental Rule Engine' in Paper UI</li>
-<li>Install the <a href="https://openhab.jfrog.io/openhab/libs-pullrequest-local/org/openhab/addons/bundles/org.openhab.automation.module.script.graaljs/2.5.0-SNAPSHOT/org.openhab.automation.module.script.graaljs-2.5.0-SNAPSHOT.jar">GraalJS bundle</a> to upgrade JS runtime to ES6</li>
-<li>Ensure that you have created the automation scripting directories</li>
-<li>Go to the javascript community lib directory: <code>cd $OPENHAB_CONF/automation/lib/javascript/community</code></li>
-<li><code>npm i ohj</code> (you may need to install npm)</li>
-</ul>
-<h2>Usage</h2>
-<p>You should create scripts in $OPENHAB_CONF/automation/jsr223/javascript/personal.</p>
-<p>The API can be imported as a standard CommonJS module: <code>require('ohj')</code>. The ohj module itself has various sections that
-can be imported as properties of the primary import, e.g.</p>
-<pre class="prettyprint source"><code>//use destructing
-const { rules, triggers } = require('ohj');
-//or simply
-const rules = require('ohj').rules;
+        switch (prefix) {
+            case "none": return msgData.message;
+            case "level": return `[${levelString}] ${msgData.message}`
+            case "short": return `${msgData.message}\t\t[${this.name}, ${msgData.caller.fileName}:${msgData.caller.lineNumber}]`
+            case "log": return `${msgData.message}\t\t[${this.name} at source ${msgData.caller.fileName}, line ${msgData.caller.lineNumber}]`
+            default: throw Error(`Unknown prefix type ${prefix}`)
+        }
+    }
+
+    /**
+     * Logs at ERROR level.
+     * @see atLevel
+     */
+    error() { this.atLevel('error', ...arguments) }
+    /**
+     * Logs at ERROR level.
+     * @see atLevel
+     */
+    warn() { this.atLevel('warn', ...arguments) }
+    /**
+     * Logs at INFO level.
+     * @see atLevel
+     */
+    info() { this.atLevel('info', ...arguments) }
+    /**
+     * Logs at DEBUG level.
+     * @see atLevel
+     */
+    debug() { this.atLevel('debug', ...arguments) }
+    /**
+     * Logs at TRACE level.
+     * @see atLevel
+     */
+    trace() { this.atLevel('trace', ...arguments) }
+
+    /**
+     * Logs a message at the supplied level. The message may include placeholders {} which
+     * will be substituted into the message string only if the message is actually logged.
+     * 
+     * @example
+     * log.atLevel('INFO', 'The widget was created as {}', widget);
+     * 
+     * 
+     * @param {String} level The level at which to log, such as 'INFO', or 'DEBUG'
+     * @param {String|Error} msg the message to log, possibly with object placeholders
+     * @param {Object[]} [objects] the objects to substitute into the log message
+     */
+    atLevel(level, msg, ...objects) {
+        let titleCase = level[0].toUpperCase() + level.slice(1)
+        try {
+            if (this._logger[`is${titleCase}Enabled`]()) {
+                this._logger[level](this._formatLogMessage(msg, level, 6), objects);
+                if (this._listener) {
+                    this._listener(msg, level, objects)
+                }
+            }
+        } catch (err) {
+            this._logger.error(this._formatLogMessage(err, "error", 0));
+        }
+    }
+
+    /**
+     * The listener function attached to this logger.
+     * @return {*} the listener function
+     */
+    get listener() { return this._listener }
+
+    /**
+     * The name of this logger
+     * @return {String} the logger name
+     */
+    get name() { return this._name }
+}
+
+/**
+ * Creates a logger.
+ * @see Logger
+ * @name default
+ * @param {string} name the name of the logger
+ * @param {*} [_listener] an optional listener to process log events.
+ * @memberof log
+ */
+module.exports = function (_name, _listener) {
+    return new Logger(_name, _listener);
+}
 </code></pre>
-<h2>Fluent API</h2>
-<p>The fluent section of the API can be used to write rules in a high-level, readable style.</p>
-<p>The cleanest way to use the API is with a <code>with</code> statement. This is so that it's possible to use the exported functions
-without a prefix. An alternative approach (to allow <code>'use strict'</code>) would be to explicitly import the functions that you
-use, such as <code>const {when, then} = require('ohj').fluent</code>. The following examples will use the <code>with</code> style of importing.</p>
-<p>Note that for the <code>timeOfDay</code> API, you must create a <code>vTimeOfDay</code> String item, which is updated like in <a href="https://community.openhab.org/t/design-pattern-time-of-day/15407">the Openhab pattern</a>. A future release will check this.</p>
-<h2>Fluent Examples</h2>
-<pre class="prettyprint source"><code>with(require('ohj').fluent){
-
-    //turn on the kitchen light at SUNSET
-    when(timeOfDay(&quot;SUNSET&quot;)).then(sendOn().toItem(&quot;KitchenLight&quot;));
-
-    //turn off the kitchen light at 9PM
-    when(cron(&quot;0 0 21 * * ?&quot;)).then(sendOff().toItem(&quot;KitchenLight&quot;));
-
-    //set the colour of the hall light to pink at 9PM
-    when(cron(&quot;0 0 21 * * ?&quot;)).then(send(&quot;300,100,100&quot;).toItem(&quot;HallLight&quot;)
-
-    //when the switch S1 status changes to ON, then turn on the HallLight
-    when(item('S1').changed().toOn()).then(sendOn().toItem('HallLight'));
-
-    //when the HallLight colour changes pink, if the function fn returns true, then toggle the state of the OutsideLight
-    when(item('HallLight').changed().to(&quot;300,100,100&quot;)).if(fn).then(sendToggle().toItem('OutsideLight'));
-}
-
-//and some rules which can be toggled by the items created in the 'gRules' Group:
-
-with(require('ohj').fluent.withToggle) {
-
-    //when the HallLight receives a command, send the same command to the KitchenLight
-    when(item('HallLight').receivedCommand()).then(sendIt().toItem('KitchenLight'));
- 
-    //when the HallLight is updated to ON, make sure that BedroomLight1 is set to the same state as the BedroomLight2
-    when(item('HallLight').receivedUpdate()).then(copyState().fromItem('BedroomLight1').toItem('BedroomLight2'));
-
-    //when the BedroomLight1 is changed, run a custom function
-    when(item('BedroomLight1').changed()).then(() => {
-        // do stuff
-    });
-}
-</code></pre></article>
+        </article>
     </section>
-
-
 
 
 

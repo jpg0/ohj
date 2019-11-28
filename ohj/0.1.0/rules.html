@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>rules - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html">CopyStateOperation</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html#and">and</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html#fromItem">fromItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html#toItem">toItem</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="fluent.FunctionConditionConf.html">FunctionConditionConf</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="FluentRule.html">FluentRule</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="items.OHItem.html">OHItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#getMetadataValue">getMetadataValue</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#postUpdate">postUpdate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#sendCommand">sendCommand</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#sendCommandIfDifferent">sendCommandIfDifferent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="log.Logger.html">Logger</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#atLevel">atLevel</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#error">error</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#info">info</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#trace">trace</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#warn">warn</a></span></li><li class="nav-heading">Namespaces</li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="actions.html">actions</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="fluent.html">fluent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.copyAndSendState">copyAndSendState</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.copyState">copyState</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.cron">cron</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.inGroup">inGroup</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.item">item</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.send">send</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendIt">sendIt</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendOff">sendOff</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendOn">sendOn</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendToggle">sendToggle</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.stateOfItem">stateOfItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.timeOfDay">timeOfDay</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.when">when</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="items.html">items</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.html#.addItem">addItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.html#.removeItem">removeItem</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="log.html">log</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="osgi.html">osgi</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="osgi.html#.findServices">findServices</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="osgi.html#.getService">getService</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="rules.html">rules</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="rules.html#.JSRule">JSRule</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="rules.html#.SwitchableJSRule">SwitchableJSRule</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="triggers.html">triggers</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">rules</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        rules
+        </h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Rules namespace.
+This namespace allows creation of Openhab rules.</p></div>
+        
+
+        
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="rules.js.html">rules.js</a>, <a href="rules.js.html#line2">line 2</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id=".JSRule"><span class="type-signature">(static) </span>JSRule<span class="signature">(ruleConfig)</span><span class="type-signature"> &rarr; {HostRule}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Creates a rule. The rule will be created and immediately available.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="rules.js.html">rules.js</a>, <a href="rules.js.html#line107">line 107</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ruleConfig</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Object</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>The rule config describing the rule</p>
+                
+                    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the name of the rule</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>a description of the rule</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>execute</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>callback that will be called when the rule fires</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>triggers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Array.&lt;<a href="global.html#HostTrigger">HostTrigger</a>></code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>triggers which will define when to fire the rule</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>HostRule</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>the created rule</p>
+</div>
+
+    
+</div>
+
+
+
+<div class="section-examples">
+<h5>Example</h5>
+
+    <pre class="prettyprint"><code>import { rules, triggers } = require('ohj');
+
+rules.JSRule({
+ name: "my_new_rule",
+ description": "this rule swizzles the swallows",
+ triggers: triggers.GenericCronTrigger("0 30 16 * * ? *"),
+ execute: triggerConfig => { //do stuff }
+});</code></pre>
+
+</div>
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id=".SwitchableJSRule"><span class="type-signature">(static) </span>SwitchableJSRule<span class="signature">(ruleConfig)</span><span class="type-signature"> &rarr; {HostRule}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Creates a rule, with an associated SwitchItem that can be used to toggle the rule's enabled state.
+The rule will be created and immediately available.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="rules.js.html">rules.js</a>, <a href="rules.js.html#line159">line 159</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>ruleConfig</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Object</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>The rule config describing the rule</p>
+                
+                    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the name of the rule</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>description</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>a description of the rule</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>execute</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>callback that will be called when the rule fires</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>triggers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>Array.&lt;<a href="global.html#HostTrigger">HostTrigger</a>></code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>triggers which will define when to fire the rule</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ruleGroup</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the name of the rule group to use.</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>HostRule</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>the created rule</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Thu Nov 28 2019 05:51:10 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>OHItem - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html">CopyStateOperation</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html#and">and</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html#fromItem">fromItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.CopyStateOperation.html#toItem">toItem</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="fluent.FunctionConditionConf.html">FunctionConditionConf</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="FluentRule.html">FluentRule</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="items.OHItem.html">OHItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#getMetadataValue">getMetadataValue</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#postUpdate">postUpdate</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#sendCommand">sendCommand</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.OHItem.html#sendCommandIfDifferent">sendCommandIfDifferent</a></span></li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="log.Logger.html">Logger</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#atLevel">atLevel</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#debug">debug</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#error">error</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#info">info</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#trace">trace</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="log.Logger.html#warn">warn</a></span></li><li class="nav-heading">Namespaces</li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="actions.html">actions</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="fluent.html">fluent</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.copyAndSendState">copyAndSendState</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.copyState">copyState</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.cron">cron</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.inGroup">inGroup</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.item">item</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.send">send</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendIt">sendIt</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendOff">sendOff</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendOn">sendOn</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.sendToggle">sendToggle</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.stateOfItem">stateOfItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.timeOfDay">timeOfDay</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="fluent.html#.when">when</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="items.html">items</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.html#.addItem">addItem</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="items.html#.removeItem">removeItem</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="log.html">log</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="osgi.html">osgi</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="osgi.html#.findServices">findServices</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="osgi.html#.getService">getService</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="rules.html">rules</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="rules.html#.JSRule">JSRule</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="rules.html#.SwitchableJSRule">SwitchableJSRule</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="triggers.html">triggers</a></span></li><li class="nav-heading"><a href="global.html">Globals</a></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">OHItem</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="items.html">items</a>~</span>
+        
+        OHItem
+        </h2>
+        
+            <div class="class-description"><p>Class representing an Openhab Item</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+<div class="section-method">
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="OHItem"><span class="type-signature"></span>new OHItem<span class="signature">(rawItem)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Create an OHItem, wrapping a native Java Openhab Item. Don't use this constructor, instead call <code>getItem</code>.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>rawItem</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>HostItem</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>Java Item from Host</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="descendents"><span class="type-signature"></span>descendents<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>All descendents of the current group item (as returned by 'getAllMembers()'). Must be a group item.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line83">line 83</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="isUninitialized"><span class="type-signature"></span>isUninitialized<span class="type-signature"> :Boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Whether this item is initialized.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line92">line 92</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><code>Boolean</code></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="name"><span class="type-signature"></span>name<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The name of the item.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line59">line 59</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="rawState"><span class="type-signature"></span>rawState<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The raw state of the item, as a java object.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line75">line 75</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="state"><span class="type-signature"></span>state<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The state of the item, as a string.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line67">line 67</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id="type"><span class="type-signature"></span>type<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>The type of the item: the Simple (without package) name of the Java item type, such as 'Switch'.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line51">line 51</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="getMetadataValue"><span class="type-signature"></span>getMetadataValue<span class="signature">(namespace)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Gets metadata values for this item.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line108">line 108</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>namespace</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>The namespace for the metadata to retreive</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>String</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>the metadata associated with the item</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="postUpdate"><span class="type-signature"></span>postUpdate<span class="signature">(value)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Posts an update to the item</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line144">line 144</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li>sendCommand</li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+|
+
+<span class="param-type"><code>HostState</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the value of the command to send, such as 'ON'</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="sendCommand"><span class="type-signature"></span>sendCommand<span class="signature">(value)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Sends a command to the item</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line118">line 118</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li>sendCommandIfDifferent</li>
+        
+            <li>postUpdate</li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+|
+
+<span class="param-type"><code>HostState</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the value of the command to send, such as 'ON'</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="sendCommandIfDifferent"><span class="type-signature"></span>sendCommandIfDifferent<span class="signature">(value)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Sends a command to the item, but only if the current state is not what is being sent.
+Note</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items.js.html">items.js</a>, <a href="items.js.html#line130">line 130</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li>sendCommand</li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+|
+
+<span class="param-type"><code>HostState</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the value of the command to send, such as 'ON'</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>Boolean</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>true if the command was sent, false otherwise</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Thu Nov 28 2019 05:51:10 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
