@@ -1,6 +1,14 @@
 
-var HashSet = Java.type("java.util.HashSet");
-var ArrayList = Java.type("java.util.ArrayList");
+const log = require('./log')('utils');
+
+const HashSet = Java.type("java.util.HashSet");
+const ArrayList = Java.type("java.util.ArrayList");
+
+function getAllPropertyNames (obj) {
+    const proto     = Object.getPrototypeOf(obj);
+    const inherited = (proto) ? getAllPropertyNames(proto) : [];
+    return [...new Set(Object.getOwnPropertyNames(obj).concat(inherited))];
+}
 
 exports.jsArrayToJavaSet = function (arr) {
     let set = new HashSet();
@@ -55,7 +63,7 @@ exports.dumpObject = function (obj) {
             }
         }
 
-        log.info("Object.getOwnPropertyNames(obj) = {}", Object.getOwnPropertyNames(obj));
+        log.info("getAllPropertyNames(obj) = {}", getAllPropertyNames(obj));
         // log.info("obj.toString() = {}", obj.toString());
         // log.info("JSON.stringify(obj) = {}", JSON.stringify(obj));
     } catch(e) {

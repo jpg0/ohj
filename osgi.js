@@ -1,58 +1,80 @@
+/**
+ * OSGi module.
+ * This module provides access to OSGi services.
+ * 
+ * @namespace osgi
+ */
+
+const log = require('./log')('osgi');
 
 const FrameworkUtil = Java.type("org.osgi.framework.FrameworkUtil");
+const bundle = FrameworkUtil.getBundle(Java.type("org.openhab.core.automation.module.script.ScriptExtensionProvider"));
+const bundleContext = (bundle !== null) ? bundle.getBundleContext() : null;
 
-const _bundle = FrameworkUtil.getBundle(Java.type("org.openhab.core.automation.module.script.ScriptExtensionProvider"));
-
-const bundle_context = (_bundle !== null) ? _bundle.getBundleContext() : null;
-const registered_services = [];
-
-exports.get_service = function (class_or_name) {
-    if (bundle_context !== null) {
+/**
+ * Gets a service registered with OSGi.
+ * 
+ * @private
+ * @param {String|HostClass} class_or_name the class of the service to get
+ * @returns an instance of the service, or null if it cannot be found
+ * @memberOf osgi
+ */
+let lookupService = function (class_or_name) {
+    if (bundleContext !== null) {
         var classname = (typeof class_or_name === "object") ? class_or_name.getName() : class_or_name;
-        var ref = bundle_context.getServiceReference(classname);
-        return (ref !== null) ? bundle_context.getService(ref) : null;
+        var ref = bundleContext.getServiceReference(classname);
+        return (ref !== null) ? bundleContext.getService(ref) : null;
     }
 }
 
-exports.find_services = function (class_name, filter) {
-    if (bundle_context !== null) {
-        var refs = bundle_context.getAllServiceReferences(class_name, filter);
+/**
+ * Gets a service registered with OSGi. Allows providing multiple classes/names to try for lookup.
+ * 
+ * @param {Array<String|HostClass>} class_or_names the class of the service to get
+ * 
+ * @returns an instance of the service, or null if it cannot be found
+ * @throws {Error} if no services of the requested type(s) can be found
+ * @memberOf osgi
+ */
+let getService = function (...class_or_names) {
+
+    let rv = null;
+
+    for(let class_or_name of class_or_names) {
+        try {
+            rv = lookupService(class_or_name)
+        } catch(e) {}
+
+        if(typeof rv !== 'undefined' && rv !== null) {
+            return rv;
+        }
+    }
+
+    throw Error(`Failed to get any services of type(s): ${class_or_names}`);
+}
+
+/**
+ * Finds services registered with OSGi.
+ * 
+ * @param {String} class_name the class of the service to get
+ * @param {*} [filter] an optional filter used to filter the returned services
+ * @returns {Object[]} any instances of the service that can be found
+ * @memberOf osgi
+ */
+let findServices = function (class_name, filter) {
+    if (bundleContext !== null) {
+        var refs = bundleContext.getAllServiceReferences(class_name, filter);
         if (refs !== null) {
             var services = [];
             for (var i = 0, size = refs.length; i < size; i++) {
-                services.push(bundle_context.getService(refs[i]));
+                services.push(bundleContext.getService(refs[i]));
             }
             return services;
         }
     }
 }
 
-exports.register_service = function (service, interface_names, properties) {
-    if (properties !== null) {
-        var util = Java.type("java.util");
-        p = util.Hashtable();
-        for (var i = 0, size = properties.length; i < size; i++) {
-            p.put(k, v);
-        }
-        properties = p;
-    }
-    else {
-        properties = null;
-    }
-    var reg = bundle_context.registerService(interface_names, service, properties);
-    for (var i = 0, size = interface_names.length; i < size; i++) {
-        registered_services[name] = (service, reg);
-    }
-    return reg;
-}
-
-exports.unregister_service = function (service) {
-    var keys = registered_services.keys();
-    for (var i = 0, size = keys.length; i < size; i++) {
-        var registered_service, reg = registered_services[key];
-        if (service == registered_service) {
-            registered_services.splice(i, keys[i]);
-            reg.unregister();
-        }
-    }
+module.exports = {
+    getService,
+    findServices
 }

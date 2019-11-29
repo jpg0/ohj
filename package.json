@@ -9,6 +9,7 @@
         "url": "git://github.com/jpg0/ohj.git"
     },
     "dependencies": {
+        "better-docs": "^1.4.7",
         "cronstrue": "^1.84.0",
         "parse-duration": "^0.1.1"
     },

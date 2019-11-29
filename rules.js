@@ -1,27 +1,45 @@
 
+/**
+ * Rules namespace.
+ * This namespace allows creation of Openhab rules.
+ * 
+ * @namespace rules
+ */
+
 const GENERATED_RULE_ITEM_TAG = "GENERATED_RULE_ITEM";
 
-const ohitems = require('./items');
+const items = require('./items');
 const utils = require('./utils');
 const log = require('./log')('rules');
 const itemhistory = require('./itemhistory');
 const osgi = require('./osgi');
 const triggers = require('./triggers');
-const automationManager = require('@runtime/RuleSupport').automationManager;
+const { automationManager } = require('@runtime/RuleSupport');
 
-let RuleManager = null;
-try {
-    RuleManager = osgi.get_service("org.openhab.core.automation.RuleManager")
-} catch(e) {
-    RuleManager = osgi.get_service("org.eclipse.smarthome.automation.RuleManager")
-}
+let RuleManager = osgi.getService("org.openhab.core.automation.RuleManager","org.eclipse.smarthome.automation.RuleManager");
 
+/**
+ * Generates an item name given it's configuration.
+ * 
+ * @memberOf rules
+ * @private
+ * @param {Object} ruleConfig The rule config
+ * @param {String} userInfo.name The name of the rule.
+ */
 const itemNameForRule = function (ruleConfig) {
-    return "vRuleItemFor" + ohitems.safeItemName(ruleConfig.name);
+    return "vRuleItemFor" + items.safeItemName(ruleConfig.name);
 }
 
+/**
+ * Links an item to a rule. When the item is switched on or off, so will the rule be.
+ * 
+ * @memberOf rules
+ * @private
+ * @param {HostRule} rule The rule to link to the item.
+ * @param {OHItem} item the item to link to the rule.
+ */
 const linkItemToRule = function (rule, item) {
-    exports.JSRule({
+    JSRule({
         name: "vProxyRuleFor" + rule.getName(),
         description: "Generated Rule to toggle real rule for " + rule.getName(),
         triggers: [
@@ -31,8 +49,8 @@ const linkItemToRule = function (rule, item) {
             try {
                 var itemState = data.state;
                 log.debug("Rule toggle item state received as " + itemState);
-                RuleManager.setEnabled(rule.getUID(), itemState == OFF ? false : true);
-                log.info((itemState == OFF ? "Disabled" : "Enabled") + " rule " + rule.getName() + " [" + rule.getUID() + "]");
+                RuleManager.setEnabled(rule.getUID(), itemState == 'OFF' ? false : true);
+                log.info((itemState == 'OFF' ? "Disabled" : "Enabled") + " rule " + rule.getName() + " [" + rule.getUID() + "]");
             } catch (e) {
                 log.error("Failed to toggle rule " + rule.getName() + ": " + e);
             }
@@ -40,28 +58,58 @@ const linkItemToRule = function (rule, item) {
     });
 };
 
+/**
+ * Gets the groups that an rule-toggling-item should be a member of. Will create the group item if necessary.
+ * 
+ * @memberOf rules
+ * @private
+ * @param {Object} ruleConfig The rule config describing the rule
+ * @param {String} ruleConfig.ruleGroup the name of the rule group to use.
+ * @returns {String[]} the group names to put the item in
+ */
 const getGroupsForItem = function (ruleConfig) {
     if (ruleConfig.ruleGroup) {
-        var groupName = "gRules" + ohitems.safeItemName(ruleConfig.ruleGroup);
+        var groupName = "gRules" + items.safeItemName(ruleConfig.ruleGroup);
         log.debug("Creating rule group " + ruleConfig.ruleGroup);
-        ohitems.replaceItem(groupName, "Group", null, ["gRules"], ruleConfig.ruleGroup, [GENERATED_RULE_ITEM_TAG]);
+        items.replaceItem(groupName, "Group", null, ["gRules"], ruleConfig.ruleGroup, [GENERATED_RULE_ITEM_TAG]);
         return [groupName];
     }
 
     return ["gRules"];
 }
 
-exports.JSRule = function (obj) {
-    let ruid = obj.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
-    log.info("Adding rule " + obj.name ? obj.name : ruid);
+/**
+ * Creates a rule. The rule will be created and immediately available.
+ * 
+ * @example
+ * import { rules, triggers } = require('ohj');
+ * 
+ * rules.JSRule({
+ *  name: "my_new_rule",
+ *  description": "this rule swizzles the swallows",
+ *  triggers: triggers.GenericCronTrigger("0 30 16 * * ? *"),
+ *  execute: triggerConfig => { //do stuff }
+ * });
+ * 
+ * @memberOf rules
+ * @param {Object} ruleConfig The rule config describing the rule
+ * @param {String} ruleConfig.name the name of the rule
+ * @param {String} ruleConfig.description a description of the rule
+ * @param {*} ruleConfig.execute callback that will be called when the rule fires
+ * @param {HostTrigger[]} ruleConfig.triggers triggers which will define when to fire the rule
+ * @returns {HostRule} the created rule
+ */
+let JSRule = function (ruleConfig) {
+    let ruid = ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
+    log.info("Adding rule " + ruleConfig.name ? ruleConfig.name : ruid);
 
     let SimpleRule = Java.extend(Java.type('org.openhab.core.automation.module.script.rulesupport.shared.simple.SimpleRule'));
 
     let doExecute = function (module, input) {
         try {
-            return obj.execute(getTriggeredData(input));
+            return ruleConfig.execute(getTriggeredData(input));
         } catch (error) {
-            log.error("Failed to execute rule {}: {} at line {}", ruid, error.message, error.lineNumber);
+            log.error(`Failed to execute rule ${ruid}`, error); //pass the error as an additional param to have slf4j log it
             throw error;
         }
     };
@@ -70,15 +118,15 @@ exports.JSRule = function (obj) {
         execute: doExecute
     });
 
-    var triggers = obj.triggers ? obj.triggers : obj.getEventTrigger();
+    var triggers = ruleConfig.triggers ? ruleConfig.triggers : ruleConfig.getEventTrigger();
 
     rule.setTemplateUID(ruid);
 
-    if (obj.description) {
-        rule.setDescription(obj.description);
+    if (ruleConfig.description) {
+        rule.setDescription(ruleConfig.description);
     }
-    if (obj.name) {
-        rule.setName(obj.name);
+    if (ruleConfig.name) {
+        rule.setName(ruleConfig.name);
     }
 
     //Register rule here
@@ -90,7 +138,20 @@ exports.JSRule = function (obj) {
     return rule;
 };
 
-exports.SwitchableJSRule = function (ruleConfig) {
+/**
+ * Creates a rule, with an associated SwitchItem that can be used to toggle the rule's enabled state.
+ * The rule will be created and immediately available.
+ * 
+ * @memberOf rules
+ * @param {Object} ruleConfig The rule config describing the rule
+ * @param {String} ruleConfig.name the name of the rule
+ * @param {String} ruleConfig.description a description of the rule
+ * @param {*} ruleConfig.execute callback that will be called when the rule fires
+ * @param {HostTrigger[]} ruleConfig.triggers triggers which will define when to fire the rule
+ * @param {String} ruleConfig.ruleGroup the name of the rule group to use.
+ * @returns {HostRule} the created rule
+ */
+let SwitchableJSRule = function (ruleConfig) {
 
     if (!ruleConfig.name) {
         throw Error("No name specified for rule!");
@@ -100,10 +161,10 @@ exports.SwitchableJSRule = function (ruleConfig) {
     var itemName = itemNameForRule(ruleConfig);
 
     //then add the item
-    var item = ohitems.replaceItem(itemName, "Switch", null, getGroupsForItem(ruleConfig), ruleConfig.description, [GENERATED_RULE_ITEM_TAG]);
+    var item = items.replaceItem(itemName, "Switch", null, getGroupsForItem(ruleConfig), ruleConfig.description, [GENERATED_RULE_ITEM_TAG]);
 
     //create the real rule
-    var rule = exports.JSRule(ruleConfig);
+    var rule = JSRule(ruleConfig);
 
     //hook up a rule to link the item to the actual rule
     linkItemToRule(rule, item);
@@ -184,4 +245,9 @@ const getTriggeredData = function (input) {
             }
     }
     return d;
-};	
+};
+
+module.exports = {
+    JSRule,
+    SwitchableJSRule
+}

@@ -1,27 +1,60 @@
 const parse_duration = require('parse-duration');
 const log = require('../log')('operation-conf');
-const ohitems = require('../items');
+const items = require('../items');
 
+/**
+ * Copies state from one item to another item
+ * 
+ * @memberof fluent
+ * @hideconstructor
+ */
 class CopyStateOperation {
+    
+    /**
+     * Creates a new operation. Don't use constructor directly.
+     * 
+     * @param {Boolean} send whether to send (or post update) the state
+     */
     constructor(send) {
         this.send = send;
     }
 
+    /**
+     * Sets the item to copy the state from
+     * @param {String} item_name the item to copy state from
+     * @returns {CopyStateOperation} this
+     */
     fromItem(item_name){
         this.from_item = item_name;
         return this;
     }
 
+    /**
+     * Sets the item to copy the state to
+     * @param {String} item_name the item to copy state to
+     * @returns {CopyStateOperation} this
+     */
     toItem(item_name){
         this.to_item = item_name;
         return this;
     }
 
+    /**
+     * Appends another operation to execute when the rule fires
+     * @param {CopyStateOperation|SendCommandOperation|ToggleOperation} next 
+     * @returns {CopyStateOperation} this
+     */
     and(next) {
         this.next = next;
         return this;
     }
     
+    /**
+     * Runs the operation. Don't call directly.
+     * 
+     * @private
+     * @param {Object} args rule firing args
+     */
     _run(args){
 
         if(typeof this.from_item === 'undefined' || this.from_item === null) {
@@ -32,12 +65,12 @@ class CopyStateOperation {
             throw Error("To item not set");
         }
 
-        let from = ohitems.getItem(this.from_item);
+        let from = items.getItem(this.from_item);
         if(typeof from === 'undefined' || from === null) {
             throw Error(`Cannot find (from) item ${this.from_item}`);
         }
 
-        let to = ohitems.getItem(this.to_item);
+        let to = items.getItem(this.to_item);
         if(typeof to === 'undefined' || to === null) {
             throw Error(`Cannot find (to) item ${this.to_item}`);
         }
@@ -52,40 +85,68 @@ class CopyStateOperation {
         }
     }
 
+    /**
+     * Checks that the operation configuration is complete. Don't call directly.
+     * 
+     * @private
+     * @returns true only if the operation is ready to run
+     */
     _complete(){
         return this.from_item && this.to_item;
     }
 
+    /**
+     * Describes the operation.
+     * 
+     * @private
+     * @returns a description of the operation
+     */
     describe(){
         return `copy state from ${this.from_item} to ${this.to_item}`
     }
 }
 
-class SendCommandOperation {
-    constructor(commandOrSupplier, optionalDesc) {
-        this.next = null;
-        if(typeof commandOrSupplier ==='string') {
-            this.commandFn = () => commandOrSupplier;
-            this.commandDesc = optionalDesc || commandOrSupplier;
+class SendCommandOrUpdateOperation {
+    constructor(dataOrSupplier, isCommand = true, optionalDesc) {
+        this.isCommand = isCommand;
+        if(typeof dataOrSupplier ==='string') {
+            this.dataFn = () => dataOrSupplier;
+            this.dataDesc = optionalDesc || dataOrSupplier;
         } else {
-            this.commandFn = commandOrSupplier;
-            this.commandDesc = optionalDesc || '[something]';
+            this.dataFn = dataOrSupplier;
+            this.dataDesc = optionalDesc || '[something]';
         }
+    }
+
+    toItem(itemName) {
+        this.toItemName = itemName;
+        return this;
+    }
+
+    and(next) {
+        this.next = next;
+        return this;
+    }
+
+    _run(args) {
+        let item = items.getItem(this.toItemName);
+        let data = this.dataFn(args);
         
-        this.toItem = function (itemName) {
-            this.operation = {
-                execute: (args) => ohitems.getItem(itemName).sendCommand(this.commandFn(args)),
-                describe: () => `send ${this.commandDesc} to ${itemName}` + (this.next ? ` and ${this.next.describe()}` : "")
-            };
-            return this;
-        };
-        this.and = function (next) {
-            this.next = next;
-            return this;
+        if(this.isCommand) {
+            item.sendCommand(data)
+        } else {
+            item.postUpdate(data);
         }
-        this._run = (args) => this.operation.execute(args) && (this.next && this.next.execute(args))
-        this._complete = () => true;
-        this.describe = () => this.operation.describe();
+
+        this.next && this.next.execute(args);
+    }
+
+    _complete() {
+        return (typeof this.toItemName) !== 'undefined';
+    }
+
+    describe() {
+        return (this.isCommand ? 'send command' : 'post update') + ` ${this.dataDesc} to ${this.toItemName}` + (this.next ? ` and ${this.next.describe()}` : "")
     }
 }
 
@@ -106,7 +167,7 @@ class ToggleOperation {
     }
 
     doToggle(){
-        let item = ohitems.getItem(this.itemName);
+        let item = items.getItem(this.itemName);
 
         switch(item.type) {
             case "SwitchItem": {
@@ -175,7 +236,7 @@ class TimingItemStateOperation {
 }
 
 module.exports = {
-    SendCommandOperation,
+    SendCommandOrUpdateOperation,
     TimingItemStateOperation,
     ToggleOperation,
     CopyStateOperation
