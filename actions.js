@@ -17,7 +17,7 @@
 
 
 const osgi = require('./osgi');
-const utils = require('./util');
+const utils = require('./utils');
 
 const oh1_actions = osgi.findServices("org.openhab.core.scriptengine.action.ActionService", null) || [];
 const oh2_actions = osgi.findServices("org.eclipse.smarthome.model.script.engine.action.ActionService", null) || [];

@@ -127,7 +127,7 @@ class OHItem {
      * @see sendCommand
      */
     sendCommandIfDifferent(value) {
-        if(value.toString() != this.state.toString()) {
+        if (value.toString() != this.state.toString()) {
             this.sendCommand(value);
             return true;
         }
@@ -310,5 +310,22 @@ module.exports = {
      * @param {String} s the name to make value
      * @returns {String} a valid item name
      */
-    safeItemName: s => s.replace(/[^a-zA-Z0-9_]/g, '_')
+    safeItemName: s => s.replace(/[^a-zA-Z0-9_]/g, '_'),
+    /**
+     * Custom indexer, to allow static item lookup.
+     * @example
+     * let { my_object_name } = require('ohj').items.objects;
+     * ...
+     * let my_state = my_object_name.state; //my_object_name is an OHItem
+     * 
+     * @returns {Object} a collection of items allowing indexing by item name
+     */
+    objects: () => new Proxy({}, {
+        get: function (target, name) {
+            if (typeof name === 'string' && /^-?\d+$/.test(name))
+                return getItem(name);
+
+            throw Error("unsupported function call: " + name);
+        }
+    })
 }

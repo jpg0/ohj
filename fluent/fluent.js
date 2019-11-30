@@ -86,9 +86,11 @@ class FluentRule {
             fnToExecute = (x) => this.condition.check(x) && fnWithoutCheck(x)
         }
 
+        let desc = this.describe();
+
         return ruleClass({
-            name: items.safeItemName(this.describe()),
-            description: this.name,
+            name: items.safeItemName(desc),
+            description: desc,
             triggers: generatedTriggers,
             ruleGroup: optionalRuleGroup,
             execute: function (data) {
@@ -103,15 +105,6 @@ class FluentRule {
 }
 
 const fluentExports = {
-    /**
-     * Specifies when the rule should occur.
-     * 
-     * @memberof fluent
-     * @param {ItemTriggerConfig|CronTriggerConfig} config specifies the rule triggers
-     * @returns {FluentRule} the fluent rule builder
-     */
-    when: o => new FluentRule(o, true),
-
     /**
      * Specifies a period of day for the rule to fire. Note that this functionality depends on a 'vTimeOfDay' String item
      * existing and being updated.
@@ -231,6 +224,13 @@ const fluentExports = {
 }
 
 module.exports = Object.assign({
+    /**
+     * Specifies when the rule should occur. Will create a standard rule.
+     * 
+     * @memberof fluent
+     * @param {ItemTriggerConfig|CronTriggerConfig} config specifies the rule triggers
+     * @returns {FluentRule} the fluent rule builder
+     */
     when: o => new FluentRule(o, false),
 }, fluentExports);
 
@@ -241,5 +241,12 @@ module.exports = Object.assign({
  * @name withToggle
  */
 module.exports.withToggle = Object.assign({
+    /**
+     * Specifies when the rule should occur. Will create a toggle-able rule.
+     * 
+     * @memberof fluent
+     * @param {ItemTriggerConfig|CronTriggerConfig} config specifies the rule triggers
+     * @returns {FluentRule} the fluent rule builder
+     */
     when: o => new FluentRule(o, true),
 }, fluentExports);

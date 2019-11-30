@@ -12,5 +12,7 @@ module.exports = {
     fluent: require('./fluent'),
     rules: require('./rules'),
     items: require('./items'),
-    triggers: require('./triggers')
+    triggers: require('./triggers'),
+    actions: require('./actions'),
+    utils: require('./utils')
 }
