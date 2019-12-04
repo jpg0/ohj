@@ -7,11 +7,18 @@
  */
 
 const PersistenceExtensions = Java.type("org.eclipse.smarthome.model.persistence.extensions.PersistenceExtensions");
+const DateTime = Java.type('org.joda.time.DateTime');
 
-
-exports.historicState = function (item, timestamp) {
+let historicState = function (item, timestamp) {
     //todo: check item param
     let history = PersistenceExtensions.historicState(item.rawItem, timestamp);
     
     return history === null ? null : history.state;
 };
+
+let latestState = (item) => historicState(item, DateTime.now());
+
+module.exports = {
+    historicState,
+    latestState
+}

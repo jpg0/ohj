@@ -171,7 +171,7 @@ let SwitchableJSRule = function (ruleConfig) {
 
     if (item.isUninitialized) {
         //possibly load item's prior state
-        let historicState = itemhistory.historicState(item, /*todo:fixme*/Java.type("org.joda.time.DateTime").now());
+        let historicState = itemhistory.latestState(item);
 
         if (historicState !== null) {
             item.postUpdate(historicState);

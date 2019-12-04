@@ -34,6 +34,10 @@ exports.javaSetToJsArray = function(set) {
     return Java.from(new ArrayList(set));
 }
 
+exports.javaSetToJsSet = function(set) {
+    return new Set(exports.javaSetToJsArray(set));
+}
+
 exports.randomUUID = () => Java.type("java.util.UUID").randomUUID();
 
 exports.dumpObject = function (obj) {

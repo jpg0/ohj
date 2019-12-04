@@ -76,11 +76,19 @@ class OHItem {
     }
 
     /**
+     * Members / children / direct descendents of the current group item (as returned by 'getMembers()'). Must be a group item.
+     * @returns {OHItem[]} member items
+     */
+    get descendents() {
+        return utils.javaSetToJsSet(this.rawItem.getMembers()).map(raw => new OHItem(raw));
+    }
+
+    /**
      * All descendents of the current group item (as returned by 'getAllMembers()'). Must be a group item.
      * @returns {OHItem[]} all descendent items
      */
     get descendents() {
-        return utils.javaSetToJsArray(this.rawItem.getAllMembers()).map(raw => new OHItem(raw));
+        return utils.javaSetToJsSet(this.rawItem.getAllMembers()).map(raw => new OHItem(raw));
     }
 
     /**
@@ -143,6 +151,48 @@ class OHItem {
     postUpdate(value) {
         events.postUpdate(this.rawItem, value);
         log.debug("Posted update {} to {}", value, this.name);
+    }
+
+    /**
+     * Adds groups to this item
+     * @param {Array<String|OHItem>} groupNamesOrItems names of the groups (or the group items themselves)
+     */
+    addGroups(...groupNamesOrItems) {
+        let groupNames = groupNamesOrItems.map((x) => (typeof x === 'string') ? x : x.name);
+        this.rawItem.addGroupNames(groupNames);
+        managedItemProvider.update(this.rawItem);
+    }
+
+    /**
+     * Removes groups from this item
+     * @param {Array<String|OHItem>} groupNamesOrItems names of the groups (or the group items themselves)
+     */
+    removeGroups(...groupNamesOrItems) {
+        let groupNames = groupNamesOrItems.map((x) => (typeof x === 'string') ? x : x.name);
+        for(let groupName of groupNames) {
+            this.rawItem.removeGroupName(groupName);
+        }
+        managedItemProvider.update(this.rawItem);
+    }
+
+    /**
+     * Adds tags to this item
+     * @param {Array<String>} tagNames names of the tags to add
+     */
+    addTags(...tagNames) {
+        this.rawItem.addTags(tagNames);
+        managedItemProvider.update(this.rawItem);
+    }
+
+    /**
+     * Removes tags from this item
+     * @param {Array<String>} tagNames names of the tags to remove
+     */
+    removeTags(...tagNames) {
+        for(let tagName of tagNames) {
+            this.rawItem.removeTag(tagName);
+        }
+        managedItemProvider.update(this.rawItem);
     }
 }
 
@@ -300,9 +350,20 @@ const getItem = (name) => {
     throw Error("Failed to get item named: " + name);
 }
 
+/**
+ * Gets all Openhab Items with a specific tag.
+ * @param {String[]} tagNames an array of tags to match against
+ * @return {OHItem[]} the items with a tag that is included in the passed tags
+ * @alias module:ohj/items.getItemsByTag
+ */
+const getItemsByTag = (...tagNames) => {
+    return utils.javaSetToJsSet(itemRegistry.getItemsByTag(...tagNames).map(i => new OHItem(i)));
+}
+
 module.exports = {
     getItem,
     addItem,
+    getItemsByTag,
     replaceItem,
     removeItem,
     /**
