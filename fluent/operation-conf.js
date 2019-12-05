@@ -118,8 +118,13 @@ class SendCommandOrUpdateOperation {
         }
     }
 
-    toItem(itemName) {
-        this.toItemName = itemName;
+    toItems(itemsOrNames) {
+        this.toItemNames = itemsOrNames.map(i => (typeof i === 'string') ? i : i.name)
+        return this;
+    }
+
+    toItem(itemOrName) {
+        this.toItemNames = [(typeof itemOrName === 'string') ? itemOrName : itemOrName.name];
         return this;
     }
 
@@ -129,24 +134,26 @@ class SendCommandOrUpdateOperation {
     }
 
     _run(args) {
-        let item = items.getItem(this.toItemName);
-        let data = this.dataFn(args);
-        
-        if(this.isCommand) {
-            item.sendCommand(data)
-        } else {
-            item.postUpdate(data);
+        for(let toItemName of this.toItemNames) {
+            let item = items.getItem(toItemName);
+            let data = this.dataFn(args);
+            
+            if(this.isCommand) {
+                item.sendCommand(data)
+            } else {
+                item.postUpdate(data);
+            }
         }
 
         this.next && this.next.execute(args);
     }
 
     _complete() {
-        return (typeof this.toItemName) !== 'undefined';
+        return (typeof this.toItemNames) !== 'undefined';
     }
 
     describe() {
-        return (this.isCommand ? 'send command' : 'post update') + ` ${this.dataDesc} to ${this.toItemName}` + (this.next ? ` and ${this.next.describe()}` : "")
+        return (this.isCommand ? 'send command' : 'post update') + ` ${this.dataDesc} to ${this.toItemNames}` + (this.next ? ` and ${this.next.describe()}` : "")
     }
 }
 

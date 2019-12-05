@@ -79,8 +79,8 @@ class OHItem {
      * Members / children / direct descendents of the current group item (as returned by 'getMembers()'). Must be a group item.
      * @returns {OHItem[]} member items
      */
-    get descendents() {
-        return utils.javaSetToJsSet(this.rawItem.getMembers()).map(raw => new OHItem(raw));
+    get members() {
+        return utils.javaSetToJsArray(this.rawItem.getMembers()).map(raw => new OHItem(raw));
     }
 
     /**
@@ -88,7 +88,7 @@ class OHItem {
      * @returns {OHItem[]} all descendent items
      */
     get descendents() {
-        return utils.javaSetToJsSet(this.rawItem.getAllMembers()).map(raw => new OHItem(raw));
+        return utils.javaSetToJsArray(this.rawItem.getAllMembers()).map(raw => new OHItem(raw));
     }
 
     /**
@@ -357,7 +357,7 @@ const getItem = (name) => {
  * @alias module:ohj/items.getItemsByTag
  */
 const getItemsByTag = (...tagNames) => {
-    return utils.javaSetToJsSet(itemRegistry.getItemsByTag(...tagNames).map(i => new OHItem(i)));
+    return utils.javaSetToJsArray(itemRegistry.getItemsByTag(...tagNames)).map(i => new OHItem(i));
 }
 
 module.exports = {

@@ -187,6 +187,17 @@ const fluentExports = {
     sendIt: () => new operations.SendCommandOrUpdateOperation(args => args.it, true, "it"),
 
     /**
+     * Specifies a command state should be posted to the target object
+     * as a result of this rule firing. This relies on the trigger being the result
+     * of a command itself.
+     * 
+     * @memberof fluent
+     * @returns {SendCommandOrUpdateOperation} the operation
+     */
+    postIt: () => new operations.SendCommandOrUpdateOperation(args => args.it, false, "it"),
+
+
+    /**
      * Specifies an item as the source of changes to trigger a rule.
      * 
      * @memberof fluent

@@ -14,10 +14,9 @@
  * @namespace actions
  */
 
-
-
 const osgi = require('./osgi');
 const utils = require('./utils');
+const { actions } = require('@runtime/Defaults');
 
 const oh1_actions = osgi.findServices("org.openhab.core.scriptengine.action.ActionService", null) || [];
 const oh2_actions = osgi.findServices("org.eclipse.smarthome.model.script.engine.action.ActionService", null) || [];
@@ -34,3 +33,5 @@ let Ping = utils.typeWithFallback('org.openhab.core.model.script.actions.Ping', 
 [Exec, HTTP, LogAction, Ping].forEach(function (item) {
     exports[item.class.getSimpleName()] = item.class.static;
 });
+
+exports.get = (...args) => actions.get(...args)

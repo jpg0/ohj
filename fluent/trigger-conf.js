@@ -12,8 +12,12 @@ class CronTriggerConfig {
 
 
 class ItemTriggerConfig {
-    constructor(item_name) {
-        this.item_name = item_name;
+    constructor(itemOrName) {
+        if(typeof itemOrName !== 'string') {
+            itemOrName = itemOrName.name;
+        }
+        
+        this.item_name = itemOrName;
         this.describe = () => `item ${this.item_name} changed`
         this.of = this.to; //receivedCommand().of(..)
     }
