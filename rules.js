@@ -184,7 +184,7 @@ let SwitchableJSRule = function (ruleConfig) {
 const getTriggeredData = function (input) {
     let event = input.get('event');
 
-    if(Java.typeName(event.class) === 'org.eclipse.smarthome.core.items.events.ItemCommandEvent') {
+    if(event && Java.typeName(event.class) === 'org.eclipse.smarthome.core.items.events.ItemCommandEvent') {
         return {
             eventType: "command",
             triggerType: "ItemCommandTrigger",

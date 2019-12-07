@@ -184,7 +184,7 @@ const fluentExports = {
      * @memberof fluent
      * @returns {SendCommandOrUpdateOperation} the operation
      */
-    sendIt: () => new operations.SendCommandOrUpdateOperation(args => args.it, true, "it"),
+    sendIt: () => new operations.SendCommandOrUpdateOperation(args => args.it.toString(), true, "it"),
 
     /**
      * Specifies a command state should be posted to the target object
@@ -194,7 +194,7 @@ const fluentExports = {
      * @memberof fluent
      * @returns {SendCommandOrUpdateOperation} the operation
      */
-    postIt: () => new operations.SendCommandOrUpdateOperation(args => args.it, false, "it"),
+    postIt: () => new operations.SendCommandOrUpdateOperation(args => args.it.toString(), false, "it"),
 
 
     /**
