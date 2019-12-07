@@ -101,7 +101,7 @@ const getGroupsForItem = function (ruleConfig) {
  */
 let JSRule = function (ruleConfig) {
     let ruid = ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
-    log.info("Adding rule " + ruleConfig.name ? ruleConfig.name : ruid);
+    log.info("Adding rule: {}", ruleConfig.name ? ruleConfig.name : ruid);
 
     let SimpleRule = Java.extend(Java.type('org.openhab.core.automation.module.script.rulesupport.shared.simple.SimpleRule'));
 
@@ -182,9 +182,19 @@ let SwitchableJSRule = function (ruleConfig) {
 }
 
 const getTriggeredData = function (input) {
-
-    //log.debug("input", input);
     let event = input.get('event');
+
+    if(Java.typeName(event.class) === 'org.eclipse.smarthome.core.items.events.ItemCommandEvent') {
+        return {
+            eventType: "command",
+            triggerType: "ItemCommandTrigger",
+            receivedCommand: event.getItemCommand(),
+            oldState: input.get("oldState") + "",
+            newState: input.get("newState") + "",
+            itemName: event.getItemName()
+        }
+    }
+
     var ev = event + "";
     //log.debug("event",ev.split("'").join("").split("Item ").join("").split(" "));
     var evArr = [];
@@ -216,11 +226,11 @@ const getTriggeredData = function (input) {
     }
 
     switch (evArr[1]) {
-        case "received":
-            d.eventType = "command";
-            d.triggerType = "ItemCommandTrigger";
-            d.receivedCommand = input.get("command") + "";
-            break;
+        // case "received":
+        //     d.eventType = "command";
+        //     d.triggerType = "ItemCommandTrigger";
+        //     d.receivedCommand = input.get("command") + "";
+        //     break;
         case "updated":
             d.eventType = "update";
             d.triggerType = "ItemStateUpdateTrigger";
@@ -245,6 +255,8 @@ const getTriggeredData = function (input) {
                 d.triggerType = "";
             }
     }
+
+
     return d;
 };
 

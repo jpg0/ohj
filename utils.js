@@ -65,6 +65,8 @@ exports.dumpObject = function (obj) {
                     }
                 }
             }
+        } else if (typeof obj === 'string'){
+            log.info("String value = " + obj);
         }
 
         log.info("getAllPropertyNames(obj) = {}", getAllPropertyNames(obj));

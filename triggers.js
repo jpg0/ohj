@@ -80,7 +80,7 @@ module.exports = {
      * @example
      * ItemStateUpdateTrigger('my_item', 'OFF')
      * 
-     * @name ItemStateChangeTrigger
+     * @name ItemStateUpdateTrigger
      * @memberof triggers
      * @param {String} itemName the name of the item to monitor for change
      * @param {String} [state] the new state of the item
