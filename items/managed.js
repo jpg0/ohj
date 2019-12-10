@@ -1,14 +1,10 @@
-/**
- * Items namespace.
- * This namespace handles querying and updating Openhab Items.
- * @namespace items
- */
 
-const osgi = require('./osgi');
-const utils = require('./utils');
-const log = require('./log')('items');
-const metadata = require('./metadata');
-const { UnDefType, events, itemRegistry } = require('@runtime/Defaults');
+
+const osgi = require('../osgi');
+const utils = require('../utils');
+const log = require('../log')('items');
+const metadata = require('../metadata');
+const { UnDefType, events, itemRegistry } = require('@runtime');
 
 const itemBuilderFactory = osgi.getService(
     "org.openhab.core.items.ItemBuilderFactory",
@@ -197,7 +193,7 @@ class OHItem {
 }
 
 /**
- * Creates a new item within OpenHab. This item will persist regardless of the lifecycle of the script creating it.
+ * Creates a new item within OpenHab. This item is not registered with any provider.
  * 
  * Note that all items created this way have an additional tag attached, for simpler retrieval later. This tag is
  * created with the value {@link DYNAMIC_ITEM_TAG}.
@@ -212,7 +208,7 @@ class OHItem {
  * @param {HostItem} [giBaseType] the group Item base type for the Item
  * @param {HostGroupFunction} [groupFunction] the group function used by the Item
  */
-const addItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction) {
+const createItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction) {
     var baseItem;
     if (itemType !== 'Group' && typeof (giBaseType) !== 'undefined') {
         baseItem = itemBuilderFactory.newItemBuilder(giBaseType, itemName + "_baseItem").build()
@@ -247,19 +243,35 @@ const addItem = function (itemName, itemType, category, groups, label, tags, giB
 
         var item = builder.build();
 
-        log.debug("Adding item:" + item);
-
-        managedItemProvider.add(item);
-
-        log.debug("Item added: " + item);
-
         return new OHItem(item);
 
     } catch (e) {
-        log.error("Failed to add item: " + e);
+        log.error("Failed to create item: " + e);
         throw e;
     }
+}
 
+/**
+ * Creates a new item within OpenHab. This item will persist regardless of the lifecycle of the script creating it.
+ * 
+ * Note that all items created this way have an additional tag attached, for simpler retrieval later. This tag is
+ * created with the value {@link DYNAMIC_ITEM_TAG}.
+ * 
+ * @memberOf items
+ * @param {String} itemName Item name for the Item to create
+ * @param {String} [itemType] the type of the Item
+ * @param {String} [category] the category (icon) for the Item
+ * @param {String[]} [groups] an array of groups the Item is a member of
+ * @param {String} [label] the label for the Item
+ * @param {String[]} [tags] an array of tags for the Item
+ * @param {HostItem} [giBaseType] the group Item base type for the Item
+ * @param {HostGroupFunction} [groupFunction] the group function used by the Item
+ */
+const addItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction) {
+    let item = createItem(...arguments);
+    managedItemProvider.add(item.rawItem);
+    log.debug("Item added: {}", item);
+    return item;
 }
 
 /**
@@ -365,13 +377,9 @@ module.exports = {
     addItem,
     getItemsByTag,
     replaceItem,
+    createItem,
     removeItem,
-    /**
-     * Helper function to ensure an item name is valid. All invalid characters are replaced with an underscore.
-     * @param {String} s the name to make value
-     * @returns {String} a valid item name
-     */
-    safeItemName: s => s.replace(/[^a-zA-Z0-9_]/g, '_'),
+    OHItem,
     /**
      * Custom indexer, to allow static item lookup.
      * @example

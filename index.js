@@ -6,7 +6,6 @@
  * @typedef {Object} HostTrigger Native Jave Openhab Trigger (instance of org.openhab.core.automation.Trigger)
  */
 
-
 module.exports = {
     log: require('./log'),
     fluent: require('./fluent'),
@@ -14,5 +13,6 @@ module.exports = {
     items: require('./items'),
     triggers: require('./triggers'),
     actions: require('./actions'),
-    utils: require('./utils')
+    utils: require('./utils'),
+    osgi: require('./osgi')
 }

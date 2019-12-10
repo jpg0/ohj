@@ -10,6 +10,14 @@ function getAllPropertyNames (obj) {
     return [...new Set(Object.getOwnPropertyNames(obj).concat(inherited))];
 }
 
+exports.jsSetToJavaSet = function(set) {
+    let rv = new HashSet();
+
+    set.forEach(e => rv.add(e));
+
+    return rv;
+}
+
 exports.jsArrayToJavaSet = function (arr) {
     let set = new HashSet();
 

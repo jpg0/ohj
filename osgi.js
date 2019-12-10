@@ -12,16 +12,21 @@ const bundle = FrameworkUtil.getBundle(Java.type("org.openhab.core.automation.mo
 const bundleContext = (bundle !== null) ? bundle.getBundleContext() : null;
 
 /**
+ * Map of interface names to sets of services registered (by this module)
+ */
+let registeredServices = {};
+
+/**
  * Gets a service registered with OSGi.
  * 
  * @private
- * @param {String|HostClass} class_or_name the class of the service to get
+ * @param {String|HostClass} classOrName the class of the service to get
  * @returns an instance of the service, or null if it cannot be found
  * @memberOf osgi
  */
-let lookupService = function (class_or_name) {
+let lookupService = function (classOrName) {
     if (bundleContext !== null) {
-        var classname = (typeof class_or_name === "object") ? class_or_name.getName() : class_or_name;
+        var classname = (typeof classOrName === "object") ? classOrName.getName() : classOrName;
         var ref = bundleContext.getServiceReference(classname);
         return (ref !== null) ? bundleContext.getService(ref) : null;
     }
@@ -30,19 +35,19 @@ let lookupService = function (class_or_name) {
 /**
  * Gets a service registered with OSGi. Allows providing multiple classes/names to try for lookup.
  * 
- * @param {Array<String|HostClass>} class_or_names the class of the service to get
+ * @param {Array<String|HostClass>} classOrNames the class of the service to get
  * 
  * @returns an instance of the service, or null if it cannot be found
  * @throws {Error} if no services of the requested type(s) can be found
  * @memberOf osgi
  */
-let getService = function (...class_or_names) {
+let getService = function (...classOrNames) {
 
     let rv = null;
 
-    for(let class_or_name of class_or_names) {
+    for(let classOrName of classOrNames) {
         try {
-            rv = lookupService(class_or_name)
+            rv = lookupService(classOrName)
         } catch(e) {}
 
         if(typeof rv !== 'undefined' && rv !== null) {
@@ -50,31 +55,49 @@ let getService = function (...class_or_names) {
         }
     }
 
-    throw Error(`Failed to get any services of type(s): ${class_or_names}`);
+    throw Error(`Failed to get any services of type(s): ${classOrNames}`);
 }
 
 /**
  * Finds services registered with OSGi.
  * 
- * @param {String} class_name the class of the service to get
+ * @param {String} className the class of the service to get
  * @param {*} [filter] an optional filter used to filter the returned services
  * @returns {Object[]} any instances of the service that can be found
  * @memberOf osgi
  */
-let findServices = function (class_name, filter) {
+let findServices = function (className, filter) {
     if (bundleContext !== null) {
-        var refs = bundleContext.getAllServiceReferences(class_name, filter);
-        if (refs !== null) {
-            var services = [];
-            for (var i = 0, size = refs.length; i < size; i++) {
-                services.push(bundleContext.getService(refs[i]));
-            }
-            return services;
+        var refs = bundleContext.getAllServiceReferences(className, filter);
+        return [...refs].map(ref => bundleContext.getService(ref));
+    }
+}
+
+let registerService = function(service, interfaceNames) {
+    let registration = bundleContext.registerService(interfaceNames, service, null);
+    for (let interfaceName of interfaceNames) {
+        if(typeof registeredServices[interfaceName] === 'undefined') {
+            registeredServices[interfaceName] = new Set();
         }
+        registeredServices[interfaceName].add({service, registration});
+    }
+    return registration;
+}
+
+let unregisterService = function(serviceToUnregister) {
+    for(let servicesForInterface of registeredServices) {
+        servicesForInterface.forEach(({service, registration}) => {
+            if (service == serviceToUnregister) {
+                servicesForInterface.delete({service, registration});
+                registration.unregister();
+            }
+        });
     }
 }
 
 module.exports = {
     getService,
-    findServices
+    findServices,
+    registerService,
+    unregisterService
 }
