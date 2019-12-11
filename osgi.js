@@ -69,7 +69,7 @@ let getService = function (...classOrNames) {
 let findServices = function (className, filter) {
     if (bundleContext !== null) {
         var refs = bundleContext.getAllServiceReferences(className, filter);
-        return [...refs].map(ref => bundleContext.getService(ref));
+        return refs != null ? [...refs].map(ref => bundleContext.getService(ref)) : null;
     }
 }
 

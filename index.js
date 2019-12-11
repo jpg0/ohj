@@ -11,8 +11,10 @@ module.exports = {
     fluent: require('./fluent'),
     rules: require('./rules'),
     items: require('./items'),
+    things: require('./things'),
     triggers: require('./triggers'),
     actions: require('./actions'),
     utils: require('./utils'),
-    osgi: require('./osgi')
+    osgi: require('./osgi'),
+    provider: require('./provider')
 }

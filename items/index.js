@@ -15,11 +15,6 @@
     objects
   } = require('./managed');
 
-const {
-    staticItemsProvider,
-    managedItemsProvider
-} = require('./provider');
-
 module.exports = {
     getItem,
     addItem,
@@ -36,6 +31,5 @@ module.exports = {
      */
     safeItemName: s => s.replace(/[^a-zA-Z0-9_]/g, '_'),
     
-    staticItemsProvider,
-    managedItemsProvider
+    provider: require('./itemsprovider')
 }

@@ -1,36 +1,14 @@
 const osgi = require('../osgi');
 const items = require('./managed');
 const utils = require('../utils');
+const { AbstractProvider } = require('../provider');
 
 const ITEM_PROVIDER_CLASS = "org.eclipse.smarthome.core.items.ItemProvider";
 
-let JSItemsProviderType = Java.extend(Java.type(ITEM_PROVIDER_CLASS));
 
-class AbstractJSItemsProvider {
-    constructor() {
-        require('@runtime').lifecycleTracker.addDisposeHook(this.unregister.bind(this));
-    }
-
-    register() {
-        let hostProvider = new JSItemsProviderType({
-            addProviderChangeListener: this.addProviderChangeListener.bind(this),
-            removeProviderChangeListener: this.removeProviderChangeListener.bind(this),
-            getAll: this.getAll.bind(this)
-        });
-
-        this.hostProvider = hostProvider;
-
-        osgi.registerService(hostProvider, ITEM_PROVIDER_CLASS);
-    }
-
-    unregister() {
-        osgi.unregisterService(this.hostProvider);
-    }
-}
-
-class StaticJSItemsProvider {
+class StaticItemProvider extends AbstractProvider {
     constructor(items) {
-        this.super();
+        super(ITEM_PROVIDER_CLASS);
         this.items = items;
         this.registerService();
     }
@@ -47,9 +25,9 @@ class StaticJSItemsProvider {
 }
 
 
-class ManagedJSItemsProvider extends AbstractJSItemsProvider {
+class ManagedItemProvider extends AbstractProvider {
     constructor() {
-        super();
+        super(ITEM_PROVIDER_CLASS);
         this.items = new Set();
         this.listeners = new Set();
         this.registerService();
@@ -109,8 +87,30 @@ class ManagedJSItemsProvider extends AbstractJSItemsProvider {
     }
 }
 
+class StaticCallbackItemProvider extends AbstractProvider {
+    constructor() {
+        super(ITEM_PROVIDER_CLASS);
+        this.itemsCallbacks = [];
+    }
+
+    addProviderChangeListener(listener) {
+    }
+
+    removeProviderChangeListener(listener) {
+    }
+
+    addItemsCallback(callback) {
+        this.itemsCallbacks.push(callback);
+    }
+
+    getAll(){
+        return utils.jsArrayToJavaList(this.itemsCallbacks.flatMap(c => c()));
+    }
+}
+
 module.exports = {
-    staticItemsProvider: items => new StaticJSItemsProvider(items),
-    managedItemsProvider: () => new ManagedJSItemsProvider()
+    staticItemProvider: items => new StaticItemProvider(items),
+    managedItemProvider: () => new ManagedItemProvider(),
+    staticCallbackItemProvider: () => new StaticCallbackItemProvider()
 }
     
