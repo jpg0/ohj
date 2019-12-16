@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Global - Documentation</title>
+    <title>metadata/metadata.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,239 +29,73 @@
 
 <div id="main">
     
-    <h1 class="page-title">Global</h1>
-    
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>
-        
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<div class="section-members">
-<h4 class="name" id="registeredServices"><span class="type-signature"></span>registeredServices<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    <p>Map of interface names to sets of services registered (by this module)</p>
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="osgi.js.html">osgi.js</a>, <a href="osgi.js.html#line14">line 14</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-</div>
-
-        
-    
-
-    
-
-    
-        <h3 class="subsection-title">Type Definitions</h3>
-
-        
-                
-<div class="section-members">
-<h4 class="name" id="HostTrigger">HostTrigger</h4>
-
-
-
-
-<div class="description">
-    <p>Native Java Openhab State (instance of org.openhab.core.types.State)</p>
-</div>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type"><code>Object</code></span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-</div>
-
-            
-    
-
-    
-</article>
-
-</section>
+    <h1 class="page-title">metadata/metadata.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * Items' metadata namespace.
+ * This namespace provides access to metadata on items.
+ * 
+ * @private
+ * @namespace metadata
+ */
+
+const osgi = require('../osgi');
+const utils = require('../utils');
+const log = require('../log')('metadata');
+
+let MetadataRegistry = osgi.getService("org.openhab.core.items.MetadataRegistry", "org.eclipse.smarthome.core.items.MetadataRegistry");
+let Metadata = utils.typeWithFallback("org.openhab.core.items.Metadata", "org.eclipse.smarthome.core.items.Metadata");
+let MetadataKey = utils.typeWithFallback("org.openhab.core.items.MetadataKey", "org.eclipse.smarthome.core.items.MetadataKey");
+
+
+/**
+ * This function will return the Metadata object associated with the
+ * specified Item.
+ * 
+ * @memberof metadata
+ * @param {String} name of the Item
+ * @param {String} namespace name of the namespace
+ * @returns {String|null} the metadata as a string, or null
+ */
+let getValue = function(itemName, namespace) {
+    let result = MetadataRegistry.get(new MetadataKey(namespace, itemName));
+    return result ? result.value : null;
+};
+
+let addValue = function(itemName, namespace, value) {
+    let key = new MetadataKey(namespace, itemName);
+    MetadataRegistry.add(new Metadata(key, value, {}));
+}
+
+let updateValue = function(itemName, namespace, value) {
+    let metadata = createMetadata(itemName, namespace, value);
+    let result = MetadataRegistry.update(metadata);
+    return result ? result.value : null;
+}
+
+let createMetadata = function(itemName, namespace, value) {
+    log.debug("Creating metadata {}:{} = {}", namespace, itemName, value);
+    let key = new MetadataKey(namespace, itemName);
+    return new Metadata(key, value, {});
+}
+
+module.exports = {
+    getValue,
+    addValue,
+    updateValue,
+    createMetadata,
+    provider: require('./metadata-provider')
+};</code></pre>
+        </article>
+    </section>
 
 
 
