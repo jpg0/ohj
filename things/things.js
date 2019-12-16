@@ -1,8 +1,10 @@
 const JavaThingBuilder = Java.type('org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder');
 const ThingTypeUID = Java.type('org.eclipse.smarthome.core.thing.ThingTypeUID');
-const ChannelBuilder = Java.type('org.eclipse.smarthome.core.thing.binding.builder.ChannelBuilder');
+const JavaChannelBuilder = Java.type('org.eclipse.smarthome.core.thing.binding.builder.ChannelBuilder');
 const ChannelUID = Java.type('org.eclipse.smarthome.core.thing.ChannelUID');
 const ThingUID = Java.type('org.eclipse.smarthome.core.thing.ThingUID');
+const ChannelKind = Java.type('org.eclipse.smarthome.core.thing.type.ChannelKind');
+const ChannelTypeUID = Java.type('org.eclipse.smarthome.core.thing.type.ChannelTypeUID');
 
 
 class OHThing {
@@ -28,16 +30,20 @@ class ThingBuilder {
         }
 
         this.thingTypeUID = thingTypeUID;
-        this.thingUID = new ThingUID(thingTypeUID.getBindingId(), thingTypeUID.getId(), thingId)
         this.thingId = thingId;
-        this.rawBuilder = JavaThingBuilder.create(thingTypeUID, this.thingUID);
+
 
         if(typeof bridgeUID !== 'undefined') {
             if(typeof bridgeUID === 'string') {
                 let [bridgeBindingId, bridgeThingTypeId, bringThingId] = bridgeUID.split(':');
                 bridgeUID = new ThingUID(new ThingTypeUID(bridgeBindingId, bridgeThingTypeId), bringThingId);
             }
+            this.thingUID = new ThingUID(thingTypeUID, bridgeUID, thingId);
+            this.rawBuilder = JavaThingBuilder.create(thingTypeUID, this.thingUID);
             this.rawBuilder.withBridge(bridgeUID);
+        } else {
+            this.thingUID = new ThingUID(thingTypeUID, thingId);
+            this.rawBuilder = JavaThingBuilder.create(thingTypeUID, this.thingUID);
         }
     }
 
@@ -56,17 +62,41 @@ class ThingBuilder {
     }
 }
 
+class ChannelBuilder {
+    constructor(thingUID, channelId, acceptedItemType) {
+        let channelUID = new ChannelUID(thingUID, channelId);
+        this.rawBuilder = JavaChannelBuilder.create(channelUID, acceptedItemType);
+    }
 
+    withProperties(props){
+        this.rawBuilder.withProperties(props);
+        return this;
+    }
 
-let createChannel = function(thingUID, channelId, acceptedItemType, properties){
-    let channelUID = new ChannelUID(thingUID, channelId);
-    let builder = ChannelBuilder.create(channelUID, acceptedItemType);
-    builder.withProperties(properties);
-    return new OHChannel(builder.build());
+    withKind(stateOrTrigger){
+        this.rawBuilder.withKind(ChannelKind.parse(stateOrTrigger));
+        return this;
+    }
+
+    withLabel(label){
+        this.rawBuilder.withLabel(label);
+        return this;
+    }
+
+    withType(channelType){
+        if(typeof channelType === 'string') {
+            channelType = new ChannelTypeUID(channelType);
+        }
+        this.rawBuilder.withType(channelType);
+        return this;
+    }
+
+    build(){
+        return new OHChannel(this.rawBuilder.build());
+    }
 }
-
 
 module.exports = {
     newThingBuilder: (thingTypeUID, id, bridgeUID) => new ThingBuilder(thingTypeUID, id, bridgeUID),
-    createChannel
+    newChannelBuilder: (thingUID, channelId, acceptedItemType) => new ChannelBuilder(thingUID, channelId, acceptedItemType)
 }
