@@ -31,5 +31,5 @@ module.exports = {
      */
     safeItemName: s => s.replace(/[^a-zA-Z0-9_]/g, '_'),
     
-    provider: require('./itemsprovider')
+    provider: require('./items-provider')
 }

@@ -1,9 +1,11 @@
 const osgi = require('./osgi');
+const log = require('./log')('provider');
+const utils = require('./utils');
 
 class AbstractProvider {
-    constructor(typeName) {
-        this.javaType = Java.extend(Java.type(typeName));
-        this.typeName = typeName;
+    constructor(type) {
+        this.typeName = type.class.getName();
+        this.javaType = Java.extend(type);
     }
 
     register() {
@@ -20,10 +22,41 @@ class AbstractProvider {
     }
 
     unregister() {
+        log.debug("Unregistering service of type {}", this.typeName);
         osgi.unregisterService(this.hostProvider);
     }
 }
 
+class CallbackProvider extends AbstractProvider {
+    constructor(type){
+        super(type);
+        this.callbacks = [];
+    }
+
+    addProviderChangeListener(listener) {
+    }
+
+    removeProviderChangeListener(listener) {
+    }
+
+    addCallback(callback) {
+        this.callbacks.push(callback);
+    }
+
+    getAll(){
+        return utils.jsArrayToJavaList(this.callbacks.flatMap(c => c()));
+    }
+}
+
+let ItemChannelLinkProvider = utils.typeBySuffix('core.thing.link.ItemChannelLinkProvider');
+let MetadataProvider = utils.typeBySuffix('core.items.MetadataProvider');
+let ItemProvider = utils.typeBySuffix('core.items.ItemProvider');
+let ThingProvider = utils.typeBySuffix('core.thing.ThingProvider');
+
 module.exports = {
-    AbstractProvider
+    AbstractProvider,
+    newCallbackItemChannelLinkProvider: () => new CallbackProvider(ItemChannelLinkProvider),
+    newCallbackMetadataProvider: () => new CallbackProvider(MetadataProvider),
+    newCallbackItemProvider: () => new CallbackProvider(ItemProvider),
+    newCallbackThingProvider: () => new CallbackProvider(ThingProvider),
 }

@@ -10,7 +10,7 @@ function getAllPropertyNames (obj) {
     return [...new Set(Object.getOwnPropertyNames(obj).concat(inherited))];
 }
 
-exports.jsSetToJavaSet = function(set) {
+let jsSetToJavaSet = function(set) {
     let rv = new HashSet();
 
     set.forEach(e => rv.add(e));
@@ -18,7 +18,7 @@ exports.jsSetToJavaSet = function(set) {
     return rv;
 }
 
-exports.jsArrayToJavaSet = function (arr) {
+let jsArrayToJavaSet = function (arr) {
     let set = new HashSet();
 
     for (let i of arr) {
@@ -28,7 +28,7 @@ exports.jsArrayToJavaSet = function (arr) {
     return set;
 };
 
-exports.jsArrayToJavaList = function (arr) {
+let jsArrayToJavaList = function (arr) {
     let list = new ArrayList();
 
     for (let i of arr) {
@@ -38,17 +38,17 @@ exports.jsArrayToJavaList = function (arr) {
     return list;
 }
 
-exports.javaSetToJsArray = function(set) {
+let javaSetToJsArray = function(set) {
     return Java.from(new ArrayList(set));
 }
 
-exports.javaSetToJsSet = function(set) {
+let javaSetToJsSet = function(set) {
     return new Set(exports.javaSetToJsArray(set));
 }
 
-exports.randomUUID = () => Java.type("java.util.UUID").randomUUID();
+let randomUUID = () => Java.type("java.util.UUID").randomUUID();
 
-exports.dumpObject = function (obj) {
+let dumpObject = function (obj) {
     try {
         log.info("Dumping object...");
         log.info("  typeof obj = {}", (typeof obj));
@@ -85,7 +85,11 @@ exports.dumpObject = function (obj) {
     }
 }
 
-exports.typeWithFallback = function(type, fallbackType) {
+let typeBySuffix = function(typeSuffix) {
+    return typeWithFallback(`org.eclipse.smarthome.${typeSuffix}`, `org.openhab.${typeSuffix}`);
+}
+
+let typeWithFallback = function(type, fallbackType) {
     let rv;
     try {
         rv = Java.type(type);
@@ -96,4 +100,16 @@ exports.typeWithFallback = function(type, fallbackType) {
         rv = Java.type(fallbackType);
     }
     return rv;
+}
+
+module.exports = {
+    jsSetToJavaSet,
+    jsArrayToJavaSet,
+    jsArrayToJavaList,
+    javaSetToJsArray,
+    javaSetToJsSet,
+    randomUUID,
+    dumpObject,
+    typeWithFallback,
+    typeBySuffix
 }

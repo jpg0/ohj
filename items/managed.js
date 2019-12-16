@@ -106,10 +106,30 @@ class OHItem {
     /**
      * Gets metadata values for this item.
      * @param {String} namespace The namespace for the metadata to retreive
-     * @returns {String} the metadata associated with the item
+     * @returns {String} the metadata associated with this item and namespace
      */
     getMetadataValue(namespace) {
-        return metadata.getMetadataValue(this.name, namespace);
+        return metadata.getValue(this.name, namespace);
+    }
+
+    /**
+     * Updates metadata values for this item.
+     * @param {String} namespace The namespace for the metadata to update
+     * @param {String} value the value to update the metadata to
+     * @returns {String} the updated value
+     */
+    updateMetadataValue(namespace, value) {
+        return metadata.updateValue(this.name, namespace, value);
+    }
+
+    /**
+     * Updates metadata values for this item.
+     * @param {Map} namespaceToValues A map of namespaces to values to update
+     */
+    updateMetadataValues(namespaceToValues) {
+        for(let k in namespaceToValues) {
+            metadata.updateValue(this.name, k, namespaceToValues[k]);
+        }
     }
 
     /**
@@ -207,8 +227,9 @@ class OHItem {
  * @param {String[]} [tags] an array of tags for the Item
  * @param {HostItem} [giBaseType] the group Item base type for the Item
  * @param {HostGroupFunction} [groupFunction] the group function used by the Item
+ * @param {Map} [itemMetadata] a map of metadata to set on the item
  */
-const createItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction) {
+const createItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction, itemMetadata) {
     var baseItem;
     if (itemType !== 'Group' && typeof (giBaseType) !== 'undefined') {
         baseItem = itemBuilderFactory.newItemBuilder(giBaseType, itemName + "_baseItem").build()
@@ -244,7 +265,6 @@ const createItem = function (itemName, itemType, category, groups, label, tags, 
         var item = builder.build();
 
         return new OHItem(item);
-
     } catch (e) {
         log.error("Failed to create item: " + e);
         throw e;

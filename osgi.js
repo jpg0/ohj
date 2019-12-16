@@ -6,10 +6,7 @@
  */
 
 const log = require('./log')('osgi');
-
-const FrameworkUtil = Java.type("org.osgi.framework.FrameworkUtil");
-const bundle = FrameworkUtil.getBundle(Java.type("org.openhab.core.automation.module.script.ScriptExtensionProvider"));
-const bundleContext = (bundle !== null) ? bundle.getBundleContext() : null;
+const bundleContext = require('@runtime/services').bundleContext;
 
 /**
  * Map of interface names to sets of services registered (by this module)
@@ -73,23 +70,29 @@ let findServices = function (className, filter) {
     }
 }
 
-let registerService = function(service, interfaceNames) {
+let registerService = function(service, ...interfaceNames) {
     let registration = bundleContext.registerService(interfaceNames, service, null);
     for (let interfaceName of interfaceNames) {
         if(typeof registeredServices[interfaceName] === 'undefined') {
             registeredServices[interfaceName] = new Set();
         }
         registeredServices[interfaceName].add({service, registration});
+        log.debug("Registered service {} of as {}", service, interfaceName)
     }
     return registration;
 }
 
 let unregisterService = function(serviceToUnregister) {
-    for(let servicesForInterface of registeredServices) {
+    log.debug("Unregistering service {}", serviceToUnregister);
+
+    for(let interfaceName in registeredServices) {
+        let servicesForInterface = registeredServices[interfaceName];
+
         servicesForInterface.forEach(({service, registration}) => {
             if (service == serviceToUnregister) {
                 servicesForInterface.delete({service, registration});
                 registration.unregister();
+                log.debug("Unregistered service: {}", service);
             }
         });
     }

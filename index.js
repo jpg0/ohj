@@ -12,9 +12,11 @@ module.exports = {
     rules: require('./rules'),
     items: require('./items'),
     things: require('./things'),
+    metadata: require('./metadata'),
     triggers: require('./triggers'),
     actions: require('./actions'),
     utils: require('./utils'),
     osgi: require('./osgi'),
-    provider: require('./provider')
+    provider: require('./provider'),
+    itemchannellink: require('./itemchannellink')
 }
