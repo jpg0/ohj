@@ -15,7 +15,7 @@
  */
 const LOGGER_PREFIX = "script.js";
 
-const RuntimeExceptionEx = Java.extend(Java.type('java.lang.RuntimeException'));
+const RuntimeExceptionEx = require('@runtime/osgi').classutil.extend(Java.type('java.lang.RuntimeException'));
 
 /**
  * Logger class. A named logger providing the ability to log formatted messages.

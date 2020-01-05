@@ -6,7 +6,7 @@
  */
 
 const log = require('./log')('osgi');
-const bundleContext = require('@runtime/services').bundleContext;
+const bundleContext = require('@runtime/osgi').bundleContext;
 
 /**
  * Map of interface names to sets of services registered (by this module)
