@@ -16,9 +16,16 @@ let historicState = function (item, timestamp) {
     return history === null ? null : history.state;
 };
 
+let previousState = function(item, skipEqual = false) {
+    let result = PersistenceExtensions.previousState(item.rawItem, skipEqual)
+
+    return result === null ? null : result.state;
+}
+
 let latestState = (item) => historicState(item, DateTime.now());
 
 module.exports = {
     historicState,
-    latestState
+    latestState,
+    previousState
 }

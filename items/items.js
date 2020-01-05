@@ -4,26 +4,8 @@
  * @namespace items
  */
 
- const { 
-    getItem,
-    addItem,
-    getItemsByTag,
-    replaceItem,
-    createItem,
-    removeItem,
-    OHItem,
-    objects
-  } = require('./managed');
-
 module.exports = {
-    getItem,
-    addItem,
-    getItemsByTag,
-    replaceItem,
-    createItem,
-    removeItem,
-    OHItem,
-    objects,
+    ...require('./managed'),
     /**
      * Helper function to ensure an item name is valid. All invalid characters are replaced with an underscore.
      * @param {String} s the name to make value

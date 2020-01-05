@@ -4,6 +4,8 @@ const osgi = require('../osgi');
 const utils = require('../utils');
 const log = require('../log')('items');
 const metadata = require('../metadata');
+const itemhistory = require('../itemhistory');
+
 const { UnDefType, events, itemRegistry } = require('@runtime');
 
 const itemBuilderFactory = osgi.getService(
@@ -56,11 +58,23 @@ class OHItem {
     }
 
     /**
+     * The label attached to the item
+     * @return {String} the label
+     */
+    get label() {
+        return this.rawItem.getLabel();
+    }
+
+    /**
      * The state of the item, as a string.
      * @return {String} the item's state
      */
     get state() {
         return this.rawState.toString();
+    }
+
+    get previousState() {
+        return itemhistory.previousState(this).toString();
     }
 
     /**

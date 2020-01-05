@@ -6,17 +6,18 @@
  * @typedef {Object} HostTrigger Native Jave Openhab Trigger (instance of org.openhab.core.automation.Trigger)
  */
 
+// lazy getters to avoid any reference loading all submodules
 module.exports = {
-    log: require('./log'),
-    fluent: require('./fluent'),
-    rules: require('./rules'),
-    items: require('./items'),
-    things: require('./things'),
-    metadata: require('./metadata'),
-    triggers: require('./triggers'),
-    actions: require('./actions'),
-    utils: require('./utils'),
-    osgi: require('./osgi'),
-    provider: require('./provider'),
-    itemchannellink: require('./itemchannellink')
+    get log() { return require('./log') },
+    get fluent() { return require('./fluent') },
+    get rules() { return require('./rules') },
+    get items() { return require('./items') },
+    get things() { return require('./things') },
+    get metadata() { return require('./metadata') },
+    get triggers() { return require('./triggers') },
+    get actions() { return require('./actions') },
+    get utils() { return require('./utils') },
+    get osgi() { return require('./osgi') },
+    get provider() { return require('./provider') },
+    get itemchannellink() { return require('./itemchannellink') }
 }
