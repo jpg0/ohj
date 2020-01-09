@@ -86,11 +86,9 @@ class FluentRule {
             fnToExecute = (x) => this.condition.check(x) && fnWithoutCheck(x)
         }
 
-        let desc = this.describe();
-
         return ruleClass({
-            name: items.safeItemName(desc),
-            description: desc,
+            name: items.safeItemName(this.describe(true)),
+            description: this.describe(false),
             triggers: generatedTriggers,
             ruleGroup: optionalRuleGroup,
             execute: function (data) {
@@ -99,8 +97,12 @@ class FluentRule {
         });
     }
 
-    describe() {
-        return "When " + this._triggerConfs.map(t => t.describe()).join(" or ") + " then " + this.operation.describe() + (this.optionalRuleGroup ? ` (in group ${this.optionalRuleGroup})` : "");
+    describe(compact) {
+        return (compact ? "When " : "") + 
+            this._triggerConfs.map(t => t.describe(compact)).join(" or ") + 
+            (compact ? "→" : " then ") + 
+            this.operation.describe(compact) + 
+            ((compact && this.optionalRuleGroup) ? ` (in group ${this.optionalRuleGroup})` : "");
     }
 }
 

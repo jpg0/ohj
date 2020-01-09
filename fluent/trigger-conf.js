@@ -6,7 +6,7 @@ class CronTriggerConfig {
         this.timeStr = timeStr;
         this._complete = () => true
         this._toOHTriggers = () => [triggers.GenericCronTrigger(this.timeStr)]
-        this.describe = () => `matches cron "${this.timeStr}"`
+        this.describe = (compact) => compact ? this.timeStr : `matches cron "${this.timeStr}"`
     }
 };
 
@@ -54,18 +54,20 @@ class ItemTriggerConfig {
         return typeof (this.op_type) !== 'undefined';
     }
 
-    describe() {
+    describe(compact) {
         switch (this.op_type) {
             case "changed":
-                let desc = `item ${this.item_name} changed`;
+                let desc = compact ? `${this.item_name}` : `item ${this.item_name} changed`;
                 if (this.to_value) {
-                    desc += ` to ${this.to_value}`;
+                    desc += compact ? `=${this.to_value}` : ` to ${this.to_value}`;
+                } else if(compact){
+                    desc += "/Δ";
                 }
                 return desc;
             case "receivedCommand":
-                    return `item ${this.item_name} received command`;
+                    return compact ? `${this.item_name}/⌘` : `item ${this.item_name} received command`;
             case "receivedUpdate":
-                    return `item ${this.item_name} received update`;
+                    return compact ? `${this.item_name}/↻` : `item ${this.item_name} received update`;
             default:
                 throw error("Unknown operation type: " + this.op_type);
         }

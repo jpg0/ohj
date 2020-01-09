@@ -264,3 +264,4 @@ module.exports = {
     JSRule,
     SwitchableJSRule
 }
+ 

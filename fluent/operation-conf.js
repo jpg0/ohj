@@ -152,8 +152,12 @@ class SendCommandOrUpdateOperation {
         return (typeof this.toItemNames) !== 'undefined';
     }
 
-    describe() {
-        return (this.isCommand ? 'send command' : 'post update') + ` ${this.dataDesc} to ${this.toItemNames}` + (this.next ? ` and ${this.next.describe()}` : "")
+    describe(compact) {
+        if(compact) {
+            return this.dataDesc + (this.isCommand ? '⌘' : '↻') + this.toItemNames + (this.next ? this.next.describe() : "")
+        } else {
+            return (this.isCommand ? 'send command' : 'post update') + ` ${this.dataDesc} to ${this.toItemNames}` + (this.next ? ` and ${this.next.describe()}` : "")
+        }
     }
 }
 

@@ -6,10 +6,7 @@ function getAllFunctionNames(obj) {
     var props = [];
     var o = obj;
     do {
-    
         props = props.concat(Object.getOwnPropertyNames(o));
-        log.error(o.constructor.name);
-
         o = Object.getPrototypeOf(o);
     } while (o.constructor.name !== 'AbstractProvider');
 

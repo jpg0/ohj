@@ -5,7 +5,7 @@ const ChannelUID = Java.type('org.eclipse.smarthome.core.thing.ChannelUID');
 const ThingUID = Java.type('org.eclipse.smarthome.core.thing.ThingUID');
 const ChannelKind = Java.type('org.eclipse.smarthome.core.thing.type.ChannelKind');
 const ChannelTypeUID = Java.type('org.eclipse.smarthome.core.thing.type.ChannelTypeUID');
-
+const Configuration = Java.type('org.eclipse.smarthome.config.core.Configuration');
 
 class OHThing {
     constructor(rawThing) {
@@ -68,8 +68,8 @@ class ChannelBuilder {
         this.rawBuilder = JavaChannelBuilder.create(channelUID, acceptedItemType);
     }
 
-    withProperties(props){
-        this.rawBuilder.withProperties(props);
+    withConfiguration(config){
+        this.rawBuilder.withConfiguration(new Configuration(config));
         return this;
     }
 
