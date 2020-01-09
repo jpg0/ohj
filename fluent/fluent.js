@@ -88,7 +88,7 @@ class FluentRule {
 
         return ruleClass({
             name: items.safeItemName(this.describe(true)),
-            description: this.describe(false),
+            description: this.describe(true),
             triggers: generatedTriggers,
             ruleGroup: optionalRuleGroup,
             execute: function (data) {
@@ -98,11 +98,11 @@ class FluentRule {
     }
 
     describe(compact) {
-        return (compact ? "When " : "") + 
+        return (compact ? "": "When ") + 
             this._triggerConfs.map(t => t.describe(compact)).join(" or ") + 
             (compact ? "→" : " then ") + 
             this.operation.describe(compact) + 
-            ((compact && this.optionalRuleGroup) ? ` (in group ${this.optionalRuleGroup})` : "");
+            ((!compact && this.optionalRuleGroup) ? ` (in group ${this.optionalRuleGroup})` : "");
     }
 }
 
