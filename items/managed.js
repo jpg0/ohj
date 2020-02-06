@@ -137,6 +137,16 @@ class OHItem {
     }
 
     /**
+     * Inserts or updates metadata values for this item.
+     * @param {String} namespace The namespace for the metadata to update
+     * @param {String} value the value to update the metadata to
+     * @returns {Boolean} true iff a new value was inserted
+     */
+    upsertMetadataValue(namespace, value) {
+        return metadata.upsertValue(this.name, namespace, value);
+    }
+
+    /**
      * Updates metadata values for this item.
      * @param {Map} namespaceToValues A map of namespaces to values to update
      */

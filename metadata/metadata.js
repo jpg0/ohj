@@ -40,6 +40,26 @@ let updateValue = function(itemName, namespace, value) {
     return result ? result.value : null;
 }
 
+/**
+ * Adds (inserts) or updates a metadata value.
+ * 
+ * @param {String} itemName the name of the item
+ * @param {String} namespace the name of the namespace
+ * @param {String} value the value to insert or update
+ * @returns {Boolean} true if the value was added, false if it was updated
+ */
+let upsertValue = function(itemName, namespace, value) {
+    let existing = getValue(itemName, namespace);
+
+    if (existing === null) {
+        addValue(itemName, namespace, value);
+        return true;
+    } else {
+        updateValue(itemName, namespace, value);
+        return false;
+    }
+}
+
 let createMetadata = function(itemName, namespace, value) {
     log.debug("Creating metadata {}:{} = {}", namespace, itemName, value);
     let key = new MetadataKey(namespace, itemName);
@@ -50,6 +70,7 @@ module.exports = {
     getValue,
     addValue,
     updateValue,
+    upsertValue,
     createMetadata,
     provider: require('./metadata-provider')
 };
