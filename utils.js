@@ -102,6 +102,18 @@ let typeWithFallback = function(type, fallbackType) {
     return rv;
 }
 
+let isJsInstanceOfJava = function(instance, type) {
+    if(!Java.isType(type)) {
+        throw error("type is not a java class");
+    }
+
+    if(instance === null || instance === undefined || instance.class === null || instance.class === undefined) {
+        return false;
+    }
+
+    return type.class.isAssignableFrom(instance.class);
+}
+
 module.exports = {
     jsSetToJavaSet,
     jsArrayToJavaSet,
@@ -111,5 +123,6 @@ module.exports = {
     randomUUID,
     dumpObject,
     typeWithFallback,
-    typeBySuffix
+    typeBySuffix,
+    isJsInstanceOfJava
 }
