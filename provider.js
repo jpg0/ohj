@@ -30,12 +30,16 @@ class AbstractProvider {
             javaConfig[fn] = this[fn].bind(this);
         }
     
-        let hostProvider = new this.javaType(javaConfig);
+        let hostProvider = this.processHostProvider(new this.javaType(javaConfig));
 
         this.hostProvider = hostProvider;
 
         require('@runtime/osgi').lifecycle.addDisposeHook(this.unregister.bind(this));
-        osgi.registerService(hostProvider, this.typeName);
+        osgi.registerService(this.hostProvider, this.typeName);
+    }
+
+    processHostProvider(hostProvider) {
+        return hostProvider;
     }
 
     unregister() {
@@ -62,6 +66,17 @@ class CallbackProvider extends AbstractProvider {
 
     getAll(){
         return utils.jsArrayToJavaList(this.callbacks.flatMap(c => c()));
+    }
+}
+
+class ItemProvider extends CallbackProvider {
+    constructor(ctxName = "JSAPI") {
+        super(utils.typeBySuffix('core.items.ItemProvider'))
+        this.ctxName = ctxName;
+    }
+
+    processHostProvider(hostProvider) {
+        return require('@runtime/provider').itemBinding.create(this.ctxName, super.processHostProvider(hostProvider));
     }
 }
 
@@ -94,14 +109,13 @@ class StateDescriptionFragmentProvider extends AbstractProvider {
 
 let ItemChannelLinkProviderClass = utils.typeBySuffix('core.thing.link.ItemChannelLinkProvider');
 let MetadataProviderClass = utils.typeBySuffix('core.items.MetadataProvider');
-let ItemProviderClass = utils.typeBySuffix('core.items.ItemProvider');
 let ThingProviderClass = utils.typeBySuffix('core.thing.ThingProvider');
 
 module.exports = {
     AbstractProvider,
     newCallbackItemChannelLinkProvider: () => new CallbackProvider(ItemChannelLinkProviderClass),
     newCallbackMetadataProvider: () => new CallbackProvider(MetadataProviderClass),
-    newCallbackItemProvider: () => new CallbackProvider(ItemProviderClass),
+    newCallbackItemProvider: c => new ItemProvider(c),
     newCallbackThingProvider: () => new CallbackProvider(ThingProviderClass),
     newCallbackStateDescriptionFragmentProvider: () => new StateDescriptionFragmentProvider
 }

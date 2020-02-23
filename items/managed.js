@@ -314,7 +314,7 @@ const createItem = function (itemName, itemType, category, groups, label, tags, 
 const addItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction) {
     let item = createItem(...arguments);
     managedItemProvider.add(item.rawItem);
-    log.debug("Item added: {}", item);
+    log.debug("Item added: {}", item.name);
     return item;
 }
 
