@@ -395,15 +395,22 @@ const replaceItem = function (/* same args as addItem */) {
 /**
  * Gets an Openhab Item.
  * @param {String} name the name of the item
+ * @param {String} nullIfMissing whether to return null if the item cannot be found (default is to throw an exception)
  * @return {OHItem} the item
  * @alias module:ohj/items.getItem
  */
-const getItem = (name) => {
-    if (typeof name === 'string' || name instanceof String) {
-        return new OHItem(itemRegistry.getItem(name));
+const getItem = (name, nullIfMissing = false) => {
+    try {
+        if (typeof name === 'string' || name instanceof String) {
+            return new OHItem(itemRegistry.getItem(name));
+        }
+    } catch(e) {
+        if(nullIfMissing) {
+            return null;
+        } else {
+            throw e;
+        }
     }
-
-    throw Error("Failed to get item named: " + name);
 }
 
 /**
