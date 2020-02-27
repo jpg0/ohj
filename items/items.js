@@ -11,7 +11,9 @@ module.exports = {
      * @param {String} s the name to make value
      * @returns {String} a valid item name
      */
-    safeItemName: s => s.replace(/[^a-zA-Z0-9_]/g, '_'),
+    safeItemName: s => s.
+        replace(/[\"\']/g, ''). //delete
+        replace(/[\.\(\) ]/g, '_'), //replace with underscore
     
     provider: require('./items-provider')
 }
