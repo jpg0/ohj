@@ -34,17 +34,11 @@ class AbstractProvider {
 
         this.hostProvider = hostProvider;
 
-        require('@runtime/osgi').lifecycle.addDisposeHook(this.unregister.bind(this));
         osgi.registerService(this.hostProvider, this.typeName);
     }
 
     processHostProvider(hostProvider) {
         return hostProvider;
-    }
-
-    unregister() {
-        log.debug("Unregistering service of type {}", this.typeName);
-        osgi.unregisterService(this.hostProvider);
     }
 }
 

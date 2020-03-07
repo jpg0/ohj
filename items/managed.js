@@ -254,6 +254,8 @@ class OHItem {
  * @param {Map} [itemMetadata] a map of metadata to set on the item
  */
 const createItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction, itemMetadata) {
+    itemName = safeItemName(itemName);
+    
     var baseItem;
     if (itemType !== 'Group' && typeof (giBaseType) !== 'undefined') {
         baseItem = itemBuilderFactory.newItemBuilder(giBaseType, itemName + "_baseItem").build()
@@ -423,7 +425,17 @@ const getItemsByTag = (...tagNames) => {
     return utils.javaSetToJsArray(itemRegistry.getItemsByTag(...tagNames)).map(i => new OHItem(i));
 }
 
+    /**
+     * Helper function to ensure an item name is valid. All invalid characters are replaced with an underscore.
+     * @param {String} s the name to make value
+     * @returns {String} a valid item name
+     */
+const safeItemName = s => s.
+        replace(/[\"\']/g, ''). //delete
+        replace(/[^a-zA-Z0-9]/g, '_'); //replace with underscore
+
 module.exports = {
+    safeItemName,
     getItem,
     addItem,
     getItemsByTag,

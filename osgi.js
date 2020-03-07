@@ -7,6 +7,7 @@
 
 const log = require('./log')('osgi');
 const bundleContext = require('@runtime/osgi').bundleContext;
+const lifecycle = require('@runtime/osgi').lifecycle;
 
 /**
  * Map of interface names to sets of services registered (by this module)
@@ -71,7 +72,14 @@ let findServices = function (className, filter) {
 }
 
 let registerService = function(service, ...interfaceNames) {
+    lifecycle.addDisposeHook(() => unregisterService(service));
+    registerPermanentService(service, ...interfaceNames);
+}
+
+let registerPermanentService = function(service, ...interfaceNames) {
+    
     let registration = bundleContext.registerService(interfaceNames, service, null);
+
     for (let interfaceName of interfaceNames) {
         if(typeof registeredServices[interfaceName] === 'undefined') {
             registeredServices[interfaceName] = new Set();

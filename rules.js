@@ -17,7 +17,8 @@ const triggers = require('./triggers');
 const { automationManager } = require('@runtime/RuleSupport');
 
 let RuleManager = osgi.getService("org.openhab.core.automation.RuleManager","org.eclipse.smarthome.automation.RuleManager");
-let RuleBuilder = utils.typeBySuffix("core.automation.util.RuleBuilder");
+let factory = require('@runtime/rules').factory;
+
 /**
  * Generates an item name given it's configuration.
  * 
@@ -132,58 +133,48 @@ let JSRule = function (ruleConfig) {
     //Register rule here
     if (triggers && triggers.length > 0) {
         rule.setTriggers(triggers);
-        rule = automationManager.addRule(rule);
+        rule = registerRule(rule);
     }
 
     return rule;
 };
 
-let JSRule2 = function(ruleConfig) {
-    let ruid = ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
-    let builder = RuleBuilder.create(ruid);
+let currentProvider = automationManager;
 
-    if (ruleConfig.description) {
-        builder.withDescription(ruleConfig.description);
-    }
-    if (ruleConfig.name) {
-        builder.withName(ruleConfig.name);
-    }
-
-    if(ruleConfig.tags) {
-        builder.withTags(ruleConfig.tags);
+let withNewRuleProvider = function(fn) {
+    let cachedRules = [];
+    currentProvider = {
+        addRule:r => {
+            //r = factory.processRule(r);
+            // r.setConfigurationDescriptions(null);
+            // r.setConfiguration(null);
+            cachedRules.push(factory.processRule(r))
+        }
     }
 
-    if (triggers && triggers.length > 0) {
-        builder.withTriggers(triggers);
+    try {
+        fn();
+        let provider = factory.newRuleProvider(cachedRules);
+        osgi.registerService(provider, utils.typeBySuffix('core.automation.RuleProvider').class.getName())
+    } finally {
+        currentProvider = automationManager;
     }
 
+}
 
-    //Actions are registered with an explicit handler. This would require more work than hoped...
+let withManagedProvider = function(fn) {
+    let previousProvider = currentProvider;
+    currentProvider = automationManager;
 
-    //     // used for numbering the modules of the rule
-    //     let moduleIndex = 1;
+    try {
+        fn();
+    } finally {
+        currentProvider = previousProvider;
+    }
+}
 
-
-    // List<Action> actions = new ArrayList<>();
-    // actions.addAll(element.getActions());
-
-    // if (element instanceof SimpleRuleActionHandler) {
-    //     String privId = addPrivateActionHandler(
-    //             new SimpleRuleActionHandlerDelegate((SimpleRuleActionHandler) element));
-
-    //     Action scriptedAction = ActionBuilder.create().withId(Integer.toString(moduleIndex++))
-    //             .withTypeUID("jsr223.ScriptedAction").withConfiguration(new Configuration()).build();
-    //     scriptedAction.getConfiguration().put("privId", privId);
-    //     actions.add(scriptedAction);
-    // }
-
-    // builder.withActions(actions);
-
-    let rule = builder.build();
-
-    //ruleRegistryDelegate.add(rule);
-    return rule;
-    
+let registerRule = function(rule) {
+    return currentProvider.addRule(rule);
 }
 
 /**
@@ -309,6 +300,7 @@ const getTriggeredData = function (input) {
 };
 
 module.exports = {
+    withNewRuleProvider,
     JSRule,
     SwitchableJSRule
 }
