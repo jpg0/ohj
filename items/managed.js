@@ -216,6 +216,13 @@ class OHItem {
     }
 
     /**
+     * Gets the tags from this item
+     */
+    get tags() {
+        return utils.javaSetToJsArray(this.rawItem.getTags());
+    }
+
+    /**
      * Adds tags to this item
      * @param {Array<String>} tagNames names of the tags to add
      */
