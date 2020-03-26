@@ -17,6 +17,8 @@ const LOGGER_PREFIX = "script.js";
 
 const RuntimeExceptionEx = require('@runtime/osgi').classutil.extend(Java.type('java.lang.RuntimeException'));
 
+const MessageFormatter = Java.type("org.slf4j.helpers.MessageFormatter");
+
 /**
  * Logger class. A named logger providing the ability to log formatted messages.
  * 
@@ -30,9 +32,9 @@ class Logger {
      * @param {String} _name the name of the logger. Will be prefixed by {@link LOGGER_PREFIX}
      * @param {*} _listener a callback to receive logging calls. Can be used to send calls elsewhere, such as escalate errors.
      */
-    constructor(_name, _listener) {
+    constructor(_name, appenderProvider) {
         this._name = _name || this._getCallerDetails("", 3).fileName.replace(/\.[^/.]+$/, "")
-        this._listener = _listener;
+        this.appenderProvider = appenderProvider;
         this._logger = Java.type("org.slf4j.LoggerFactory").getLogger(LOGGER_PREFIX + "." + this.name.toString().toLowerCase());
     }
 
@@ -148,11 +150,7 @@ class Logger {
             if (this._logger[`is${titleCase}Enabled`]()) {
 
                 this.maybeLogWithThrowable(level, msg, objects) ||
-                    this._logger[level](this._formatLogMessage(msg, level, 6), objects);
-
-                if (this._listener) {
-                    this._listener(msg, level, objects)
-                }
+                    this.writeLogLine(level, this._formatLogMessage(msg, level, 6), objects);
             }
         } catch (err) {
             this._logger.error(this._formatLogMessage(err, "error", 0));
@@ -164,14 +162,27 @@ class Logger {
             let obj = objects[0];
             if((obj instanceof Error || (obj.message && obj.name && obj.stack)) && !msg.includes("{}")) { //todo: better substitution detected
                 //log the basic message
-                this._logger[level](msg);
+                this.writeLogLine(level, msg, objects);
 
                 //and log the exception
-                this._logger[level](`${obj.name} : ${obj.message}\n${obj.stack}`);
+                this.writeLogLine(level, `${obj.name} : ${obj.message}\n${obj.stack}`);
                 return true;
             }
         }
         return false;
+    }
+
+    writeLogLine(level, message, objects = []) {
+        let formatted = MessageFormatter.arrayFormat(message, objects).getMessage();
+
+        this._logger[level](formatted);
+
+        if (this.appenderProvider) {
+            let appender = this.appenderProvider(level);
+            if(appender != null) {
+                appender.logAt(level, formatted)
+            }
+        }
     }
 
     /**
@@ -187,6 +198,22 @@ class Logger {
     get name() { return this._name }
 }
 
+let appenderForLevel = null
+//attempt to load & cache appender as module
+let getAppenderForLevel = function(){
+    if(appenderForLevel === null) {
+        appenderForLevel = () => null;
+
+        try {
+            appenderForLevel = require('log_appenders').forLevel;
+        } catch(e) {
+            new Logger("log", () => null).debug("No appenders found for log", e);
+        }
+    }
+
+    return appenderForLevel;
+}
+
 /**
  * Creates a logger.
  * @see Logger
@@ -195,6 +222,6 @@ class Logger {
  * @param {*} [_listener] an optional listener to process log events.
  * @memberof log
  */
-module.exports = function (_name, _listener) {
-    return new Logger(_name, _listener);
+module.exports = function (_name, appenderProvider = getAppenderForLevel()) {
+    return new Logger(_name, appenderProvider);
 }
