@@ -6,7 +6,7 @@
     "private": true,
     "dependencies": {
         "cronstrue": "^1.84.0",
-        "mocha": "^6.2.2",
+        "mocha": "^6.2.3",
         "parse-duration": "^0.1.1",
         "proxyquire": "^2.1.3"
     },
