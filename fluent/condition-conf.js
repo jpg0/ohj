@@ -25,6 +25,7 @@ class FunctionConditionConf {
      */
     check(...args) {
         let answer = this.fn(args);
+        log.debug("Condition returning {}", answer);
         return answer;
     }
 }
