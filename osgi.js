@@ -8,11 +8,25 @@
 const log = require('./log')('osgi');
 const bundleContext = require('@runtime/osgi').bundleContext;
 const lifecycle = require('@runtime/osgi').lifecycle;
+const Hashtable = Java.type('java.util.Hashtable');
 
 /**
  * Map of interface names to sets of services registered (by this module)
  */
 let registeredServices = {};
+
+
+let jsObjectToHashtable = function(obj) {
+    if(obj === null) {
+        return null;
+    }
+
+    let rv = new Hashtable();
+    for(let k in obj) {
+        rv.put(k, obj[k]);
+    }
+    return rv;
+}
 
 /**
  * Gets a service registered with OSGi.
@@ -67,18 +81,18 @@ let getService = function (...classOrNames) {
 let findServices = function (className, filter) {
     if (bundleContext !== null) {
         var refs = bundleContext.getAllServiceReferences(className, filter);
-        return refs != null ? [...refs].map(ref => bundleContext.getService(ref)) : null;
+        return refs != null ? [...refs].map(ref => bundleContext.getService(ref)) : [];
     }
 }
 
 let registerService = function(service, ...interfaceNames) {
     lifecycle.addDisposeHook(() => unregisterService(service));
-    registerPermanentService(service, ...interfaceNames);
+    registerPermanentService(service, interfaceNames, null);
 }
 
-let registerPermanentService = function(service, ...interfaceNames) {
+let registerPermanentService = function(service, interfaceNames, properties = null) {
     
-    let registration = bundleContext.registerService(interfaceNames, service, null);
+    let registration = bundleContext.registerService(interfaceNames, service, jsObjectToHashtable(properties));
 
     for (let interfaceName of interfaceNames) {
         if(typeof registeredServices[interfaceName] === 'undefined') {
@@ -91,6 +105,7 @@ let registerPermanentService = function(service, ...interfaceNames) {
 }
 
 let unregisterService = function(serviceToUnregister) {
+
     log.debug("Unregistering service {}", serviceToUnregister);
 
     for(let interfaceName in registeredServices) {
@@ -110,5 +125,6 @@ module.exports = {
     getService,
     findServices,
     registerService,
+    registerPermanentService,
     unregisterService
 }
