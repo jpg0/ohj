@@ -429,7 +429,7 @@ const getItem = (name, nullIfMissing = false) => {
  * @alias module:ohj/items.getItemsByTag
  */
 const getItemsByTag = (...tagNames) => {
-    return utils.javaSetToJsArray(itemRegistry.getItemsByTag(...tagNames)).map(i => new OHItem(i));
+    return utils.javaSetToJsArray(itemRegistry.getItemsByTag(tagNames)).map(i => new OHItem(i));
 }
 
     /**
