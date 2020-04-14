@@ -101,7 +101,8 @@ const getGroupsForItem = function (ruleConfig) {
  * @returns {HostRule} the created rule
  */
 let JSRule = function (ruleConfig) {
-    let ruid = ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
+    let ruid = ruleConfig.id || ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
+    let ruTemplateid = ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
     log.info("Adding rule: {}", ruleConfig.name ? ruleConfig.name : ruid);
 
     let SimpleRule = Java.extend(Java.type('org.openhab.core.automation.module.script.rulesupport.shared.simple.SimpleRule'));
@@ -116,12 +117,13 @@ let JSRule = function (ruleConfig) {
     };
 
     var rule = new SimpleRule({
-        execute: doExecute
+        execute: doExecute,
+        getUID: () => ruid
     });
 
     var triggers = ruleConfig.triggers ? ruleConfig.triggers : ruleConfig.getEventTrigger();
 
-    rule.setTemplateUID(ruid);
+    rule.setTemplateUID(ruTemplateid);
 
     if (ruleConfig.description) {
         rule.setDescription(ruleConfig.description);
