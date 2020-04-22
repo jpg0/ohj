@@ -27,6 +27,14 @@ class ItemTriggerConfig {
         return this;
     }
 
+    from(value) {
+        if(this.op_type != 'changed') {
+            throw ".from(..) only available for .changed()";
+        }
+        this.from_value = value;
+        return this;
+    }
+
     toOff() {
         return this.to('OFF');
     }
@@ -57,13 +65,25 @@ class ItemTriggerConfig {
     describe(compact) {
         switch (this.op_type) {
             case "changed":
-                let desc = compact ? `${this.item_name}` : `item ${this.item_name} changed`;
-                if (this.to_value) {
-                    desc += compact ? `=${this.to_value}` : ` to ${this.to_value}`;
-                } else if(compact){
-                    desc += "/Δ";
+                if(compact) {
+                    let transition = this.from_value + '=>' || '';
+                    if(this.to_value) {
+                        transition = (transition || '=>') + this.to_value;
+                    }
+
+                    return `${this.item_name} ${transition}/Δ`;
+                } else {
+                    let transition = 'changed';
+                    if(this.from_value) {
+                        transition += ` from ${this.from_value}`;
+                    }
+
+                    if(this.to_value) {
+                        transition += ` to ${this.to_value}`;
+                    }
+
+                    return `${this.item_name} ${transition}`;
                 }
-                return desc;
             case "receivedCommand":
                     return compact ? `${this.item_name}/⌘` : `item ${this.item_name} received command`;
             case "receivedUpdate":
@@ -80,7 +100,7 @@ class ItemTriggerConfig {
     _toOHTriggers() {
         switch (this.op_type) {
             case "changed":
-                return [triggers.ItemStateChangeTrigger(this.item_name, undefined, this.to_value)];
+                return [triggers.ItemStateChangeTrigger(this.item_name, this.from_value, this.to_value)];
             case 'receivedCommand':
                 return [triggers.ItemCommandTrigger(this.item_name, this.to_value)]
             case 'receivedUpdate':
