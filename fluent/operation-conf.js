@@ -109,12 +109,12 @@ class CopyStateOperation {
 class SendCommandOrUpdateOperation {
     constructor(dataOrSupplier, isCommand = true, optionalDesc) {
         this.isCommand = isCommand;
-        if(typeof dataOrSupplier ==='string') {
-            this.dataFn = () => dataOrSupplier;
-            this.dataDesc = optionalDesc || dataOrSupplier;
-        } else {
+        if (typeof dataOrSupplier === 'function') {
             this.dataFn = dataOrSupplier;
             this.dataDesc = optionalDesc || '[something]';
+        } else {
+            this.dataFn = () => dataOrSupplier;
+            this.dataDesc = optionalDesc || dataOrSupplier;
         }
     }
 
