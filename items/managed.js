@@ -391,7 +391,7 @@ const replaceItem = function (/* same args as addItem */) {
             removeItem(itemName);
         }
     } catch (e) {
-        if (("" + e).startsWith("org.eclipse.smarthome.core.items.ItemNotFoundException")) {
+        if (("" + e).startsWith("org.openhab.core.items.ItemNotFoundException")) {
             // item not present
         } else {
             throw e;

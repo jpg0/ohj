@@ -86,20 +86,25 @@ let dumpObject = function (obj) {
 }
 
 let typeBySuffix = function(typeSuffix) {
-    return typeWithFallback(`org.eclipse.smarthome.${typeSuffix}`, `org.openhab.${typeSuffix}`);
+    return typeWithFallback(`org.eclipse.smarthome.${typeSuffix}`, `org.openhab.${typeSuffix}`, `org.openhab.core.${typeSuffix}`);
 }
 
-let typeWithFallback = function(type, fallbackType) {
+let typeWithFallback = function(...typeList) {
     let rv;
-    try {
-        rv = Java.type(type);
-        if (rv === null) {
-            throw error("not found");
+
+    for(let type of typeList) {
+        try {
+            rv = Java.type(type);
+            if (rv === null) {
+                throw error("not found");
+            }
+            return rv;
+        } catch(e) {
+            continue;
         }
-    } catch(e) {
-        rv = Java.type(fallbackType);
     }
-    return rv;
+    
+    throw `Failed to lookup types ${typeList.join(',')}`
 }
 
 let isJsInstanceOfJava = function(instance, type) {

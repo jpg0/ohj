@@ -1,11 +1,11 @@
-const JavaThingBuilder = Java.type('org.eclipse.smarthome.core.thing.binding.builder.ThingBuilder');
-const ThingTypeUID = Java.type('org.eclipse.smarthome.core.thing.ThingTypeUID');
-const JavaChannelBuilder = Java.type('org.eclipse.smarthome.core.thing.binding.builder.ChannelBuilder');
-const ChannelUID = Java.type('org.eclipse.smarthome.core.thing.ChannelUID');
-const ThingUID = Java.type('org.eclipse.smarthome.core.thing.ThingUID');
-const ChannelKind = Java.type('org.eclipse.smarthome.core.thing.type.ChannelKind');
-const ChannelTypeUID = Java.type('org.eclipse.smarthome.core.thing.type.ChannelTypeUID');
-const Configuration = Java.type('org.eclipse.smarthome.config.core.Configuration');
+const JavaThingBuilder = Java.type('org.openhab.core.thing.binding.builder.ThingBuilder');
+const ThingTypeUID = Java.type('org.openhab.core.thing.ThingTypeUID');
+const JavaChannelBuilder = Java.type('org.openhab.core.thing.binding.builder.ChannelBuilder');
+const ChannelUID = Java.type('org.openhab.core.thing.ChannelUID');
+const ThingUID = Java.type('org.openhab.core.thing.ThingUID');
+const ChannelKind = Java.type('org.openhab.core.thing.type.ChannelKind');
+const ChannelTypeUID = Java.type('org.openhab.core.thing.type.ChannelTypeUID');
+const Configuration = Java.type('org.openhab.core.config.core.Configuration');
 
 class OHThing {
     constructor(rawThing) {
