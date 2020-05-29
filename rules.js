@@ -111,7 +111,7 @@ let JSRule = function (ruleConfig) {
         try {
             return ruleConfig.execute(getTriggeredData(input));
         } catch (error) {
-            log.error(`Failed to execute rule ${ruid}`, error); //pass the error as an additional param to have slf4j log it
+            log.error(`Failed to execute rule ${ruid}: ${error}: ${error.stack}`);
             throw error;
         }
     };

@@ -263,10 +263,11 @@ class OHItem {
 const createItem = function (itemName, itemType, category, groups, label, tags, giBaseType, groupFunction, itemMetadata) {
     itemName = safeItemName(itemName);
     
-    var baseItem;
-    if (itemType !== 'Group' && typeof (giBaseType) !== 'undefined') {
+    let baseItem;
+    if (itemType === 'Group' && typeof giBaseType !== 'undefined') {
         baseItem = itemBuilderFactory.newItemBuilder(giBaseType, itemName + "_baseItem").build()
     }
+    
     if (itemType !== 'Group') {
         groupFunction = undefined;
     }
