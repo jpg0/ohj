@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>fluent/operation-conf.js - Documentation</title>
+    <title>CopyStateOperation - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,272 +29,681 @@
 
 <div id="main">
     
-    <h1 class="page-title">fluent/operation-conf.js</h1>
+    <h1 class="page-title">CopyStateOperation</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>const parse_duration = require('parse-duration');
-const log = require('../log')('operation-conf');
-const items = require('../items');
-
-/**
- * Copies state from one item to another item
- * 
- * @memberof fluent
- * @hideconstructor
- */
-class CopyStateOperation {
+        <h2>
+            <span class="ancestors"><a href="fluent.html">fluent</a>~</span>
+        
+        CopyStateOperation
+        </h2>
+        
+            <div class="class-description"><p>Copies state from one item to another item</p></div>
+        
     
-    /**
-     * Creates a new operation. Don't use constructor directly.
-     * 
-     * @param {Boolean} send whether to send (or post update) the state
-     */
-    constructor(send) {
-        this.send = send;
-    }
+</header>
 
-    /**
-     * Sets the item to copy the state from
-     * @param {String} item_name the item to copy state from
-     * @returns {CopyStateOperation} this
-     */
-    fromItem(item_name){
-        this.from_item = item_name;
-        return this;
-    }
-
-    /**
-     * Sets the item to copy the state to
-     * @param {String} item_name the item to copy state to
-     * @returns {CopyStateOperation} this
-     */
-    toItem(item_name){
-        this.to_item = item_name;
-        return this;
-    }
-
-    /**
-     * Appends another operation to execute when the rule fires
-     * @param {CopyStateOperation|SendCommandOperation|ToggleOperation} next 
-     * @returns {CopyStateOperation} this
-     */
-    and(next) {
-        this.next = next;
-        return this;
-    }
+<article>
+    <div class="container-overview">
     
-    /**
-     * Runs the operation. Don't call directly.
-     * 
-     * @private
-     * @param {Object} args rule firing args
-     */
-    _run(args){
+        
+<div class="section-method">
 
-        if(typeof this.from_item === 'undefined' || this.from_item === null) {
-            throw Error("From item not set");
-        }
+    
+    <h2>Constructor</h2>
+    
 
-        if(typeof this.to_item === 'undefined' || this.to_item === null) {
-            throw Error("To item not set");
-        }
+    <h4 class="name" id="CopyStateOperation"><span class="type-signature"></span>new CopyStateOperation<span class="signature">(send)</span><span class="type-signature"></span></h4>
 
-        let from = items.getItem(this.from_item);
-        if(typeof from === 'undefined' || from === null) {
-            throw Error(`Cannot find (from) item ${this.from_item}`);
-        }
+    
 
-        let to = items.getItem(this.to_item);
-        if(typeof to === 'undefined' || to === null) {
-            throw Error(`Cannot find (to) item ${this.to_item}`);
-        }
 
-        if(this.send) {
-            to.sendCommand(from.state);
-        } else {
-            to.postUpdate(from.state);        
-        }
-        if(this.next){
-            this.next.execute(args);
-        }
-    }
 
-    /**
-     * Checks that the operation configuration is complete. Don't call directly.
-     * 
-     * @private
-     * @returns true only if the operation is ready to run
-     */
-    _complete(){
-        return this.from_item &amp;&amp; this.to_item;
-    }
+<div class="description">
+    <p>Creates a new operation. Don't use constructor directly.</p>
+</div>
 
-    /**
-     * Describes the operation.
-     * 
-     * @private
-     * @returns a description of the operation
-     */
-    describe(){
-        return `copy state from ${this.from_item} to ${this.to_item}`
-    }
-}
 
-class SendCommandOrUpdateOperation {
-    constructor(dataOrSupplier, isCommand = true, optionalDesc) {
-        this.isCommand = isCommand;
-        if (typeof dataOrSupplier === 'function') {
-            this.dataFn = dataOrSupplier;
-            this.dataDesc = optionalDesc || '[something]';
-        } else {
-            this.dataFn = () => dataOrSupplier;
-            this.dataDesc = optionalDesc || dataOrSupplier;
-        }
-    }
 
-    toItems(itemsOrNames) {
-        this.toItemNames = itemsOrNames.map(i => (typeof i === 'string') ? i : i.name)
-        return this;
-    }
 
-    toItem(itemOrName) {
-        this.toItemNames = [(typeof itemOrName === 'string') ? itemOrName : itemOrName.name];
-        return this;
-    }
 
-    and(next) {
-        this.next = next;
-        return this;
-    }
+<dl class="details">
 
-    _run(args) {
-        for(let toItemName of this.toItemNames) {
-            let item = items.getItem(toItemName);
-            let data = this.dataFn(args);
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fluent_operation-conf.js.html">fluent/operation-conf.js</a>, <a href="fluent_operation-conf.js.html#line18">line 18</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
             
-            if(this.isCommand) {
-                item.sendCommand(data)
-            } else {
-                item.postUpdate(data);
-            }
-        }
+                <td class="name"><code>send</code></td>
+            
 
-        this.next &amp;&amp; this.next.execute(args);
-    }
-
-    _complete() {
-        return (typeof this.toItemNames) !== 'undefined';
-    }
-
-    describe(compact) {
-        if(compact) {
-            return this.dataDesc + (this.isCommand ? '⌘' : '↻') + this.toItemNames + (this.next ? this.next.describe() : "")
-        } else {
-            return (this.isCommand ? 'send command' : 'post update') + ` ${this.dataDesc} to ${this.toItemNames}` + (this.next ? ` and ${this.next.describe()}` : "")
-        }
-    }
-}
-
-class ToggleOperation {
-    constructor() {
-        this.next = null;
-        this.toItem = function (itemName) {
-            this.itemName = itemName;
-            return this;
-        };
-        this.and = function (next) {
-            this.next = next;
-            return this;
-        };
-        this._run = () => this.doToggle() &amp;&amp; (this.next &amp;&amp; this.next.execute())
-        this._complete = () => true;
-        this.describe = () => `toggle ${this.itemName}` + (this.next ? ` and ${this.next.describe()}` : "")
-    }
-
-    doToggle(){
-        let item = items.getItem(this.itemName);
-
-        switch(item.type) {
-            case "SwitchItem": {
-                let toSend = ('ON' == item.state) ? 'OFF' : 'ON';
-                item.sendCommand(toSend);
-                break; 
-            }
-            case "ColorItem": {
-                let toSend = ('0' != item.rawState.getBrightness().toString()) ? 'OFF' : 'ON';
-                item.sendCommand(toSend);
-                break; 
-            }
-            default: 
-                throw error(`Toggle not supported for items of type ${item.type}`);
-        }
-    }
-}
-
-class TimingItemStateOperation {
-    constructor(item_changed_trigger_config, duration) {
-
-        if(typeof item_changed_trigger_config.to_value === 'undefined') {
-            throw error("Must specify item state value to wait for!");
-        }
-
-        this.item_changed_trigger_config = item_changed_trigger_config;
-        this.duration_ms = (typeof duration === 'Number' ? duration : parse_duration.parse(duration))
-
-        this._complete = item_changed_trigger_config._complete;
-        this.describe = () => item_changed_trigger_config.describe() + " for " + duration;
-    }
-
-    _toOHTriggers() {
-        //each time we're triggered, set a callback. 
-        //If the item changes to something else, cancel the callback.
-        //If the callback executes, run the operation
-
-        //register for all changes as we need to know when it changes away
-        switch (this.op_type) {
-            case "changed":
-                return [triggers.ChangedEventTrigger(this.item_name)];
-            default:
-                throw error("Unknown operation type: " + this.op_type);
-        }
-    }
-
-    _executeHook(next) {
-        if(items.get(this.item_changed_trigger_config.item_name).toString() === this.item_changed_trigger_config.to_value) {
-            _start_wait(next);
-        } else {
-            _cancel_wait();
-        }
-    }
-
-    _start_wait(next) {
-        this.current_wait = setTimeout(next, this.duration_ms);
-    }
-
-    _cancel_wait() {
-        if(this.current_wait) {
-            cancelTimeout(this.current_wait);
-        }
-    }
+            <td class="type">
+            
+                
+<span class="param-type"><code>Boolean</code></span>
 
 
-}
+            
+            </td>
 
-module.exports = {
-    SendCommandOrUpdateOperation,
-    TimingItemStateOperation,
-    ToggleOperation,
-    CopyStateOperation
-}</code></pre>
-        </article>
-    </section>
+            
+
+            
+
+            <td class="description last">
+                <p>whether to send (or post update) the state</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="and"><span class="type-signature"></span>and<span class="signature">(next)</span><span class="type-signature"> &rarr; {CopyStateOperation}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Appends another operation to execute when the rule fires</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fluent_operation-conf.js.html">fluent/operation-conf.js</a>, <a href="fluent_operation-conf.js.html#line47">line 47</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>next</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>CopyStateOperation</code></span>
+|
+
+<span class="param-type"><code>SendCommandOperation</code></span>
+|
+
+<span class="param-type"><code>ToggleOperation</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>CopyStateOperation</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="fromItem"><span class="type-signature"></span>fromItem<span class="signature">(item_name)</span><span class="type-signature"> &rarr; {CopyStateOperation}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Sets the item to copy the state from</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fluent_operation-conf.js.html">fluent/operation-conf.js</a>, <a href="fluent_operation-conf.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>item_name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the item to copy state from</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>CopyStateOperation</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="toItem"><span class="type-signature"></span>toItem<span class="signature">(item_name)</span><span class="type-signature"> &rarr; {CopyStateOperation}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Sets the item to copy the state to</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fluent_operation-conf.js.html">fluent/operation-conf.js</a>, <a href="fluent_operation-conf.js.html#line37">line 37</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>item_name</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the item to copy state to</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="section-returns">
+<h5>Returns:</h5>
+
+        
+
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>CopyStateOperation</code></span>
+
+
+    </dd>
+</dl>
+
+
+<div class="param-desc">
+    <p>this</p>
+</div>
+
+    
+</div>
+
+
+
+</div>
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -304,7 +713,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Mon Aug 03 2020 10:41:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 30 2020 23:36:38 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

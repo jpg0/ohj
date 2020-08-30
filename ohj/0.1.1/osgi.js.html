@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>fluent/fluent.js - Documentation</title>
+    <title>osgi.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">fluent/fluent.js</h1>
+    <h1 class="page-title">osgi.js</h1>
     
 
     
@@ -39,271 +39,136 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**  
- * Allows creation of rules in a fluent, human-readable style.
+            <pre class="prettyprint source linenums"><code>/**
+ * OSGi module.
+ * This module provides access to OSGi services.
  * 
- * @namespace fluent
+ * @namespace osgi
  */
 
-const log = require('../log')('fluent');
-
-const items = require('../items');
-const rules = require('../rules');
-
-const triggers = require('./trigger-conf');
-const operations = require('./operation-conf');
-const conditions = require('./condition-conf');
+const log = require('./log')('osgi');
+const bundleContext = require('@runtime/osgi').bundleContext;
+const lifecycle = require('@runtime/osgi').lifecycle;
+const Hashtable = Java.type('java.util.Hashtable');
 
 /**
- * Creates rules in a fluent style.
+ * Map of interface names to sets of services registered (by this module)
  */
-class FluentRule {
-    constructor(triggerConf, toggleable) {
-        this._triggerConfs = [];
-        this.toggleable = toggleable;
-        this.or(triggerConf);
+let registeredServices = {};
+
+
+let jsObjectToHashtable = function(obj) {
+    if(obj === null) {
+        return null;
     }
 
-    or(triggerConf) {
-        if (!triggerConf._complete()) {
-            throw Error("Trigger is not complete!");
+    let rv = new Hashtable();
+    for(let k in obj) {
+        rv.put(k, obj[k]);
+    }
+    return rv;
+}
+
+/**
+ * Gets a service registered with OSGi.
+ * 
+ * @private
+ * @param {String|HostClass} classOrName the class of the service to get
+ * @returns an instance of the service, or null if it cannot be found
+ * @memberOf osgi
+ */
+let lookupService = function (classOrName) {
+    if (bundleContext !== null) {
+        var classname = (typeof classOrName === "object") ? classOrName.getName() : classOrName;
+        var ref = bundleContext.getServiceReference(classname);
+        return (ref !== null) ? bundleContext.getService(ref) : null;
+    }
+}
+
+/**
+ * Gets a service registered with OSGi. Allows providing multiple classes/names to try for lookup.
+ * 
+ * @param {Array&lt;String|HostClass>} classOrNames the class of the service to get
+ * 
+ * @returns an instance of the service, or null if it cannot be found
+ * @throws {Error} if no services of the requested type(s) can be found
+ * @memberOf osgi
+ */
+let getService = function (...classOrNames) {
+
+    let rv = null;
+
+    for(let classOrName of classOrNames) {
+        try {
+            rv = lookupService(classOrName)
+        } catch(e) {}
+
+        if(typeof rv !== 'undefined' &amp;&amp; rv !== null) {
+            return rv;
         }
-        this._triggerConfs.push(triggerConf);
-        return this;
     }
 
-    if(condition) {
-        if(typeof condition === 'function') {
-            condition = new conditions.FunctionConditionConf(condition);
-        }
+    throw Error(`Failed to get any services of type(s): ${classOrNames}`);
+}
 
-        log.debug("Setting condition on rule: {}", condition);
-
-        this.condition = condition;
-        return this;
+/**
+ * Finds services registered with OSGi.
+ * 
+ * @param {String} className the class of the service to get
+ * @param {*} [filter] an optional filter used to filter the returned services
+ * @returns {Object[]} any instances of the service that can be found
+ * @memberOf osgi
+ */
+let findServices = function (className, filter) {
+    if (bundleContext !== null) {
+        var refs = bundleContext.getAllServiceReferences(className, filter);
+        return refs != null ? [...refs].map(ref => bundleContext.getService(ref)) : [];
     }
+}
 
-    then(operation, optionalRuleGroup) {
-        if (typeof operation === 'function') {
-            let operationFunction = operation;
-            operation = {
-                _complete: () => true,
-                _run: x => operationFunction(x),
-                describe: () => "custom function"
-            }
-        } else {
-            //first check complete
-            if (!operation._complete()) {
-                throw Error("Operation is not complete!");
-            }
+let registerService = function(service, ...interfaceNames) {
+    lifecycle.addDisposeHook(() => unregisterService(service));
+    registerPermanentService(service, interfaceNames, null);
+}
+
+let registerPermanentService = function(service, interfaceNames, properties = null) {
+    
+    let registration = bundleContext.registerService(interfaceNames, service, jsObjectToHashtable(properties));
+
+    for (let interfaceName of interfaceNames) {
+        if(typeof registeredServices[interfaceName] === 'undefined') {
+            registeredServices[interfaceName] = new Set();
         }
+        registeredServices[interfaceName].add({service, registration});
+        log.debug("Registered service {} of as {}", service, interfaceName)
+    }
+    return registration;
+}
 
-        this.operation = operation;
-        this.optionalRuleGroup = optionalRuleGroup;
+let unregisterService = function(serviceToUnregister) {
 
-        let generatedTriggers = this._triggerConfs.flatMap(x => x._toOHTriggers())
+    log.debug("Unregistering service {}", serviceToUnregister);
 
-        const ruleClass = this.toggleable ? rules.SwitchableJSRule : rules.JSRule;
+    for(let interfaceName in registeredServices) {
+        let servicesForInterface = registeredServices[interfaceName];
 
-        let fnToExecute = operation._run.bind(operation); //bind the function to it's instance
-
-        //chain (of responsibility for) the execute hooks
-        for(let triggerConf of this._triggerConfs) {
-            let next = fnToExecute;
-            if(typeof triggerConf._executeHook === 'function') {
-            let maybeHook = triggerConf._executeHook();
-                if(maybeHook) {
-                    let hook = maybeHook.bind(triggerConf); //bind the function to it's instance
-                    fnToExecute = function(args) {
-                        return hook(next, args);
-                    }
-                }
-            }
-        }
-
-        if(typeof this.condition !== 'undefined'){ //if conditional, check it first
-            log.debug("Adding condition to rule: {}", this.condition);
-            let fnWithoutCheck = fnToExecute;
-            fnToExecute = (x) => this.condition.check(x) &amp;&amp; fnWithoutCheck(x)
-        }
-
-        return ruleClass({
-            name: items.safeItemName(this.describe(true)),
-            description: this.describe(true),
-            triggers: generatedTriggers,
-            ruleGroup: optionalRuleGroup,
-            execute: function (data) {
-                    fnToExecute(data);
+        servicesForInterface.forEach(({service, registration}) => {
+            if (service == serviceToUnregister) {
+                servicesForInterface.delete({service, registration});
+                registration.unregister();
+                log.debug("Unregistered service: {}", service);
             }
         });
     }
-
-    describe(compact) {
-        return (compact ? "": "When ") + 
-            this._triggerConfs.map(t => t.describe(compact)).join(" or ") + 
-            (compact ? "→" : " then ") + 
-            this.operation.describe(compact) + 
-            ((!compact &amp;&amp; this.optionalRuleGroup) ? ` (in group ${this.optionalRuleGroup})` : "");
-    }
 }
 
-const fluentExports = {
-    /**
-     * Specifies a period of day for the rule to fire. Note that this functionality depends on a 'vTimeOfDay' String item
-     * existing and being updated.
-     * 
-     * @memberof fluent
-     * @param {String} period the period, such as 'SUNSET'
-     * @returns {ItemTriggerConfig} the trigger config
-     */
-    timeOfDay: s => new triggers.ItemTriggerConfig('vTimeOfDay').changed().to(s),
-    
-    /**
-     * Specifies a cron schedule for the rule to fire.
-     * 
-     * @memberof fluent
-     * @param {String} cronExpression the cron expression
-     * @returns {ItemTriggerConfig} the trigger config
-     */
-    cron: s => new triggers.CronTriggerConfig(s),
-
-    /**
-     * Specifies a rule group (for toggling) that this rule should belong to.
-     * 
-     * @memberof fluent
-     * @param {String} groupName the group name
-     * @returns {*} the group config
-     */
-    inGroup: g => g,
-
-    /**
-     * Specifies that a command should be sent as a result of this rule firing.
-     * 
-     * @memberof fluent
-     * @param {String} command the command to send
-     * @returns {SendCommandOrUpdateOperation} the operation
-     */
-    send: c => new operations.SendCommandOrUpdateOperation(c),
-
-    /**
-     * Specifies that an update should be posted as a result of this rule firing.
-     * 
-     * @memberof fluent
-     * @param {String} update the update to send
-     * @returns {SendCommandOrUpdateOperation} the operation
-     */
-    postUpdate: c => new operations.SendCommandOrUpdateOperation(c, false),
-
-    /**
-     * Specifies the a command 'ON' should be sent as a result of this rule firing.
-     * 
-     * @memberof fluent
-     * @returns {SendCommandOrUpdateOperation} the operation
-     */
-    sendOn: () => new operations.SendCommandOrUpdateOperation("ON"),
-
-    /**
-     * Specifies the a command 'OFF' should be sent as a result of this rule firing.
-     * 
-     * @memberof fluent
-     * @returns {SendCommandOrUpdateOperation} the operation
-     */
-    sendOff: () => new operations.SendCommandOrUpdateOperation("OFF"),
-
-    /**
-     * Specifies a command should be sent to toggle the state of the target object
-     * as a result of this rule firing.
-     * 
-     * @memberof fluent
-     * @returns {ToggleOperation} the operation
-     */
-    sendToggle: () => new operations.ToggleOperation(),
-
-    /**
-     * Specifies a command should be forwarded to the state of the target object
-     * as a result of this rule firing. This relies on the trigger being the result
-     * of a command itself.
-     * 
-     * @memberof fluent
-     * @returns {SendCommandOrUpdateOperation} the operation
-     */
-    sendIt: () => new operations.SendCommandOrUpdateOperation(args => args.it.toString(), true, "it"),
-
-    /**
-     * Specifies a command state should be posted to the target object
-     * as a result of this rule firing. This relies on the trigger being the result
-     * of a command itself.
-     * 
-     * @memberof fluent
-     * @returns {SendCommandOrUpdateOperation} the operation
-     */
-    postIt: () => new operations.SendCommandOrUpdateOperation(args => args.it.toString(), false, "it"),
-
-
-    /**
-     * Specifies an item as the source of changes to trigger a rule.
-     * 
-     * @memberof fluent
-     * @param {String} itemName the name of the item
-     * @returns {ItemTriggerConfig} the trigger config
-     */
-    item: s => new triggers.ItemTriggerConfig(s),
-    
-    /**
-     * Copies the state from one item to another. Can be used to proxy item state. State is updated, not
-     * sent as a command.
-     * 
-     * @memberof fluent
-     * @returns {CopyStateOperation} the operation config
-     */
-    copyState: () => new operations.CopyStateOperation(false),
-    
-    /**
-     * Sends the state from one item to another. Can be used to proxy item state. State is
-     * sent as a command.
-     * 
-     * @memberof fluent
-     * @returns {CopyStateOperation} the operation config
-     */
-    copyAndSendState: () => new operations.CopyStateOperation(true),
-    
-    /**
-     * Condition of an item in determining whether to process rule.
-     * 
-     * @memberof fluent
-     * @param {String} itemName the name of the item to assess the state
-     * @returns {ItemStateConditionConf} the operation config
-     */
-    stateOfItem: s => new conditions.ItemStateConditionConf(s)
-}
-
-module.exports = Object.assign({
-    /**
-     * Specifies when the rule should occur. Will create a standard rule.
-     * 
-     * @memberof fluent
-     * @param {ItemTriggerConfig|CronTriggerConfig} config specifies the rule triggers
-     * @returns {FluentRule} the fluent rule builder
-     */
-    when: o => new FluentRule(o, false),
-}, fluentExports);
-
-/**
- * Switches on toggle-able rules for all items created in this namespace.
- * 
- * @memberof fluent
- * @name withToggle
- */
-module.exports.withToggle = Object.assign({
-    /**
-     * Specifies when the rule should occur. Will create a toggle-able rule.
-     * 
-     * @memberof fluent
-     * @param {ItemTriggerConfig|CronTriggerConfig} config specifies the rule triggers
-     * @returns {FluentRule} the fluent rule builder
-     */
-    when: o => new FluentRule(o, true),
-}, fluentExports);</code></pre>
+module.exports = {
+    getService,
+    findServices,
+    registerService,
+    registerPermanentService,
+    unregisterService
+}</code></pre>
         </article>
     </section>
 
@@ -315,7 +180,7 @@ module.exports.withToggle = Object.assign({
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Mon Aug 03 2020 10:41:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 30 2020 23:36:38 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

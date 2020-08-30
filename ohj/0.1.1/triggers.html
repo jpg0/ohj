@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>fluent/condition-conf.js - Documentation</title>
+    <title>triggers - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,78 +29,519 @@
 
 <div id="main">
     
-    <h1 class="page-title">fluent/condition-conf.js</h1>
+    <h1 class="page-title">triggers</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>const log = require('../log')('condition-conf')
-const items = require('../items')
+        <h2>
+        triggers
+        </h2>
+        
+    
+</header>
 
-/**
- * Condition that wraps a function to determine whether if passes
- * @memberof fluent
- * @hideconstructor
- */
-class FunctionConditionConf {
-    /**
-     * Creates a new function condition. Don't call directly.
-     * 
-     * @param {*} fn callback which determines whether the condition passes
-     */
-    constructor(fn) {
-        this.fn = fn;
-    }
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Triggers namespace.
+This namespace allows creation of Openhab rule triggers.</p></div>
+        
 
-    /**
-     * Checks whether the rule operations should be run
-     * 
-     * @private
-     * @param  {...any} args rule trigger arguments
-     * @returns {Boolean} true only if the operations should be run
-     */
-    check(...args) {
-        let answer = this.fn(args);
-        log.debug("Condition returning {}", answer);
-        return answer;
-    }
-}
+        
 
-class ItemStateConditionConf {
-    constructor(item_name) {
-        this.item_name = item_name;
-    }
 
-    is(value) {
-        this.values = [value];
-        return this;
-    }
+<dl class="details">
 
-    in(...values) {
-        this.values = values;
-        return this;
-    }
+    
 
-    check(...args) {
-        let item = items.getItem(this.item_name);
-        if(typeof item === 'undefined' || item === null) {
-            throw Error(`Cannot find item: ${this.item_name}`);
-        }
-        return this.values.includes(item.state);
-    }
-}
+    
 
-module.exports = {
-    FunctionConditionConf,
-    ItemStateConditionConf
-}</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="triggers.js.html">triggers.js</a>, <a href="triggers.js.html#line2">line 2</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id=".ChannelEventTrigger"><span class="type-signature">(static) </span>ChannelEventTrigger<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Creates a trigger that fires upon specific events in a channel.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="triggers.js.html">triggers.js</a>, <a href="triggers.js.html#line40">line 40</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>ChannelEventTrigger('astro:sun:local:rise#event', 'START')</code></pre>
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id=".GenericCronTrigger"><span class="type-signature">(static) </span>GenericCronTrigger<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Creates a trigger that fires on a cron schedule. The supplied cron expression defines when the trigger will fire.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="triggers.js.html">triggers.js</a>, <a href="triggers.js.html#line111">line 111</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>GenericCronTrigger('0 30 16 * * ? *')</code></pre>
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id=".ItemCommandTrigger"><span class="type-signature">(static) </span>ItemCommandTrigger<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Creates a trigger that fires upon an item receiving a command. Note that the item does not need to change state.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="triggers.js.html">triggers.js</a>, <a href="triggers.js.html#line94">line 94</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>ItemCommandTrigger('my_item', 'OFF')</code></pre>
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id=".ItemStateChangeTrigger"><span class="type-signature">(static) </span>ItemStateChangeTrigger<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Creates a trigger that fires upon an item changing state.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="triggers.js.html">triggers.js</a>, <a href="triggers.js.html#line58">line 58</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>ItemStateChangeTrigger('my_item', 'OFF', 'ON')</code></pre>
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id=".ItemStateUpdateTrigger"><span class="type-signature">(static) </span>ItemStateUpdateTrigger<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Creates a trigger that fires upon an item receiving a state update. Note that the item does not need to change state.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="triggers.js.html">triggers.js</a>, <a href="triggers.js.html#line77">line 77</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>ItemStateUpdateTrigger('my_item', 'OFF')</code></pre>
+
+
+</div>
+
+        
+            
+<div class="section-members">
+<h4 class="name" id=".TimeOfDayTrigger"><span class="type-signature">(static) </span>TimeOfDayTrigger<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Creates a trigger that fires daily at a specific time. The supplied time defines when the trigger will fire.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="triggers.js.html">triggers.js</a>, <a href="triggers.js.html#line125">line 125</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>TimeOfDayTrigger('19:00')</code></pre>
+
+
+</div>
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -110,7 +551,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Mon Aug 03 2020 10:41:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 30 2020 23:36:38 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

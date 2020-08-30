@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>osgi - Documentation</title>
+    <title>Global - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">osgi</h1>
+    <h1 class="page-title">Global</h1>
     
 
     
@@ -42,7 +42,7 @@
 <header>
     
         <h2>
-        osgi
+        
         </h2>
         
     
@@ -51,9 +51,6 @@
 <article>
     <div class="container-overview">
     
-        
-            <div class="description"><p>OSGi module.
-This module provides access to OSGi services.</p></div>
         
 
         
@@ -86,11 +83,6 @@ This module provides access to OSGi services.</p></div>
     
 
     
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="osgi.js.html">osgi.js</a>, <a href="osgi.js.html#line1">line 1</a>
-    </li></ul></dd>
-    
 
     
 
@@ -115,24 +107,18 @@ This module provides access to OSGi services.</p></div>
     
 
     
-
-    
-        <h3 class="subsection-title">Methods</h3>
+        <h3 class="subsection-title">Members</h3>
 
         
             
-<div class="section-method">
+<div class="section-members">
+<h4 class="name" id="registeredServices"><span class="type-signature"></span>registeredServices<span class="type-signature"></span></h4>
 
-    
-
-    <h4 class="name" id=".findServices"><span class="type-signature">(static) </span>findServices<span class="signature">(className, filter<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Array.&lt;Object>}</span></h4>
-
-    
 
 
 
 <div class="description">
-    <p>Finds services registered with OSGi.</p>
+    <p>Map of interface names to sets of services registered (by this module)</p>
 </div>
 
 
@@ -168,7 +154,81 @@ This module provides access to OSGi services.</p></div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="osgi.js.html">osgi.js</a>, <a href="osgi.js.html#line81">line 81</a>
+        <a href="osgi.js.html">osgi.js</a>, <a href="osgi.js.html#line16">line 16</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+</div>
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+<div class="section-method">
+
+    
+
+    <h4 class="name" id="safeItemName"><span class="type-signature"></span>safeItemName<span class="signature">(s)</span><span class="type-signature"> &rarr; {String}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Helper function to ensure an item name is valid. All invalid characters are replaced with an underscore.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="items_managed.js.html">items/managed.js</a>, <a href="items_managed.js.html#line441">line 441</a>
     </li></ul></dd>
     
 
@@ -200,8 +260,6 @@ This module provides access to OSGi services.</p></div>
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -214,7 +272,7 @@ This module provides access to OSGi services.</p></div>
 
         <tr>
             
-                <td class="name"><code>className</code></td>
+                <td class="name"><code>s</code></td>
             
 
             <td class="type">
@@ -227,55 +285,11 @@ This module provides access to OSGi services.</p></div>
             </td>
 
             
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
 
             
 
             <td class="description last">
-                <p>the class of the service to get</p>
-                
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>filter</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><code>*</code></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">
-                <p>an optional filter used to filter the returned services</p>
+                <p>the name to make value</p>
                 
             </td>
         </tr>
@@ -308,7 +322,7 @@ This module provides access to OSGi services.</p></div>
     </dt>
     <dd>
         
-<span class="param-type"><code>Array.&lt;Object></code></span>
+<span class="param-type"><code>String</code></span>
 
 
     </dd>
@@ -316,7 +330,7 @@ This module provides access to OSGi services.</p></div>
 
 
 <div class="param-desc">
-    <p>any instances of the service that can be found</p>
+    <p>a valid item name</p>
 </div>
 
     
@@ -331,14 +345,14 @@ This module provides access to OSGi services.</p></div>
 
     
 
-    <h4 class="name" id=".getService"><span class="type-signature">(static) </span>getService<span class="signature">(&hellip;classOrNames)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="upsertValue"><span class="type-signature"></span>upsertValue<span class="signature">(itemName, namespace, value)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>Gets a service registered with OSGi. Allows providing multiple classes/names to try for lookup.</p>
+    <p>Adds (inserts) or updates a metadata value.</p>
 </div>
 
 
@@ -374,7 +388,7 @@ This module provides access to OSGi services.</p></div>
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="osgi.js.html">osgi.js</a>, <a href="osgi.js.html#line56">line 56</a>
+        <a href="metadata_metadata.js.html">metadata/metadata.js</a>, <a href="metadata_metadata.js.html#line51">line 51</a>
     </li></ul></dd>
     
 
@@ -406,8 +420,6 @@ This module provides access to OSGi services.</p></div>
         <th>Type</th>
 
         
-        <th>Attributes</th>
-        
 
         
 
@@ -420,34 +432,76 @@ This module provides access to OSGi services.</p></div>
 
         <tr>
             
-                <td class="name"><code>classOrNames</code></td>
+                <td class="name"><code>itemName</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><code>Array.&lt;(String|HostClass)></code></span>
+<span class="param-type"><code>String</code></span>
 
 
             
             </td>
 
             
-                <td class="attributes">
-                
 
-                
+            
 
+            <td class="description last">
+                <p>the name of the item</p>
                 
-                    &lt;repeatable><br>
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>namespace</code></td>
+            
+
+            <td class="type">
+            
                 
-                </td>
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
             
 
             
 
             <td class="description last">
-                <p>the class of the service to get</p>
+                <p>the name of the namespace</p>
+                
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>String</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>the value to insert or update</p>
                 
             </td>
         </tr>
@@ -467,38 +521,6 @@ This module provides access to OSGi services.</p></div>
 
 
 
-<div class="section-throws">
-<h5>Throws:</h5>
-
-        
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        <p>if no services of the requested type(s) can be found</p>
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type"><code>Error</code></span>
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-
-    
-</div>
-
 
 
 <div class="section-returns">
@@ -506,9 +528,21 @@ This module provides access to OSGi services.</p></div>
 
         
 
+<dl class="param-type">
+    <dt>
+        Type:
+    </dt>
+    <dd>
+        
+<span class="param-type"><code>Boolean</code></span>
+
+
+    </dd>
+</dl>
+
 
 <div class="param-desc">
-    <p>an instance of the service, or null if it cannot be found</p>
+    <p>true if the value was added, false if it was updated</p>
 </div>
 
     
@@ -520,6 +554,84 @@ This module provides access to OSGi services.</p></div>
         
     
 
+    
+        <h3 class="subsection-title">Type Definitions</h3>
+
+        
+                
+<div class="section-members">
+<h4 class="name" id="HostTrigger">HostTrigger</h4>
+
+
+
+
+<div class="description">
+    <p>Native Java Openhab State (instance of org.openhab.core.types.State)</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><code>Object</code></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+</div>
+
+            
     
 
     
@@ -535,7 +647,7 @@ This module provides access to OSGi services.</p></div>
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Mon Aug 03 2020 10:41:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 30 2020 23:36:38 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

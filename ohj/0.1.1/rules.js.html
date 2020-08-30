@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>log.js - Documentation</title>
+    <title>rules.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,7 +29,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">log.js</h1>
+    <h1 class="page-title">rules.js</h1>
     
 
     
@@ -39,233 +39,315 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/**
- * Log namespace.
- * This namespace provides loggers to log messages to the Openhab Log.
+            <pre class="prettyprint source linenums"><code>
+/**
+ * Rules namespace.
+ * This namespace allows creation of Openhab rules.
  * 
- * @example &lt;caption>Basic logging&lt;/caption>
- * let log = require('ohj').log('my_logger');
- * log.info("Hello World!")
- * 
- * @namespace log
+ * @namespace rules
  */
+
+const GENERATED_RULE_ITEM_TAG = "GENERATED_RULE_ITEM";
+
+const items = require('./items');
+const utils = require('./utils');
+const log = require('./log')('rules');
+const itemhistory = require('./itemhistory');
+const osgi = require('./osgi');
+const triggers = require('./triggers');
+const { automationManager } = require('@runtime/RuleSupport');
+
+let RuleManager = osgi.getService("org.openhab.core.automation.RuleManager","org.eclipse.smarthome.automation.RuleManager");
+let factory = require('@runtime/rules').factory;
 
 /**
- * Logger prefix
- * @memberOf log
+ * Generates an item name given it's configuration.
+ * 
+ * @memberOf rules
+ * @private
+ * @param {Object} ruleConfig The rule config
+ * @param {String} userInfo.name The name of the rule.
  */
-const LOGGER_PREFIX = "script.js";
-
-const RuntimeExceptionEx = require('@runtime/osgi').classutil.extend(Java.type('java.lang.RuntimeException'));
-
-const MessageFormatter = Java.type("org.slf4j.helpers.MessageFormatter");
+const itemNameForRule = function (ruleConfig) {
+    return "vRuleItemFor" + items.safeItemName(ruleConfig.name);
+}
 
 /**
- * Logger class. A named logger providing the ability to log formatted messages.
+ * Links an item to a rule. When the item is switched on or off, so will the rule be.
  * 
- * @memberof log
- * @hideconstructor
+ * @memberOf rules
+ * @private
+ * @param {HostRule} rule The rule to link to the item.
+ * @param {OHItem} item the item to link to the rule.
  */
-class Logger {
-    /**
-     * Creates a new logger. Don't use directly, use {@link log} on module.
-     * 
-     * @param {String} _name the name of the logger. Will be prefixed by {@link LOGGER_PREFIX}
-     * @param {*} _listener a callback to receive logging calls. Can be used to send calls elsewhere, such as escalate errors.
-     */
-    constructor(_name, appenderProvider) {
-        this._name = _name || this._getCallerDetails("", 3).fileName.replace(/\.[^/.]+$/, "")
-        this.appenderProvider = appenderProvider;
-        this._logger = Java.type("org.slf4j.LoggerFactory").getLogger(LOGGER_PREFIX + "." + this.name.toString().toLowerCase());
+const linkItemToRule = function (rule, item) {
+    JSRule({
+        name: "vProxyRuleFor" + rule.getName(),
+        description: "Generated Rule to toggle real rule for " + rule.getName(),
+        triggers: [
+            triggers.ItemStateUpdateTrigger(item.name)
+        ],
+        execute: function (data) {
+            try {
+                var itemState = data.state;
+                log.debug("Rule toggle item state received as " + itemState);
+                RuleManager.setEnabled(rule.getUID(), itemState == 'OFF' ? false : true);
+                log.info((itemState == 'OFF' ? "Disabled" : "Enabled") + " rule " + rule.getName() + " [" + rule.getUID() + "]");
+            } catch (e) {
+                log.error("Failed to toggle rule " + rule.getName() + ": " + e);
+            }
+        }
+    });
+};
+
+/**
+ * Gets the groups that an rule-toggling-item should be a member of. Will create the group item if necessary.
+ * 
+ * @memberOf rules
+ * @private
+ * @param {Object} ruleConfig The rule config describing the rule
+ * @param {String} ruleConfig.ruleGroup the name of the rule group to use.
+ * @returns {String[]} the group names to put the item in
+ */
+const getGroupsForItem = function (ruleConfig) {
+    if (ruleConfig.ruleGroup) {
+        var groupName = "gRules" + items.safeItemName(ruleConfig.ruleGroup);
+        log.debug("Creating rule group " + ruleConfig.ruleGroup);
+        items.replaceItem(groupName, "Group", null, ["gRules"], ruleConfig.ruleGroup, [GENERATED_RULE_ITEM_TAG]);
+        return [groupName];
     }
 
-    /**
-     * Method to determine caller. Don't use directly.
-     * 
-     * @private
-     * @param {Object} msg the message to get caller details for
-     * @param {Number} ignoreStackDepth the number of stack frames which to ignore in calculating caller
-     * @returns {Error} message as an error object, with fileName, caller and optional lineNumber properties
-     */
-    _getCallerDetails(msg, ignoreStackDepth) {
-        let stackLine = null;
+    return ["gRules"];
+}
 
-        if (!(msg instanceof Error)) {
-            msg = Error(msg);
-            stackLine = msg.stack.split('\n')[ignoreStackDepth];
+/**
+ * Creates a rule. The rule will be created and immediately available.
+ * 
+ * @example
+ * import { rules, triggers } = require('ohj');
+ * 
+ * rules.JSRule({
+ *  name: "my_new_rule",
+ *  description": "this rule swizzles the swallows",
+ *  triggers: triggers.GenericCronTrigger("0 30 16 * * ? *"),
+ *  execute: triggerConfig => { //do stuff }
+ * });
+ * 
+ * @memberOf rules
+ * @param {Object} ruleConfig The rule config describing the rule
+ * @param {String} ruleConfig.name the name of the rule
+ * @param {String} ruleConfig.description a description of the rule
+ * @param {*} ruleConfig.execute callback that will be called when the rule fires
+ * @param {HostTrigger[]} ruleConfig.triggers triggers which will define when to fire the rule
+ * @returns {HostRule} the created rule
+ */
+let JSRule = function (ruleConfig) {
+    let ruid = ruleConfig.id || ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
+    let ruTemplateid = ruleConfig.name.replace(/[^\w]/g, "-") + "-" + utils.randomUUID();
+    log.info("Adding rule: {}", ruleConfig.name ? ruleConfig.name : ruid);
+
+    let SimpleRule = Java.extend(Java.type('org.openhab.core.automation.module.script.rulesupport.shared.simple.SimpleRule'));
+
+    let doExecute = function (module, input) {
+        try {
+            return ruleConfig.execute(getTriggeredData(input));
+        } catch (error) {
+            log.error(`Failed to execute rule ${ruid}: ${error}: ${error.stack}`);
+            throw error;
+        }
+    };
+
+    var rule = new SimpleRule({
+        execute: doExecute,
+        getUID: () => ruid
+    });
+
+    var triggers = ruleConfig.triggers ? ruleConfig.triggers : ruleConfig.getEventTrigger();
+
+    rule.setTemplateUID(ruTemplateid);
+
+    if (ruleConfig.description) {
+        rule.setDescription(ruleConfig.description);
+    }
+    if (ruleConfig.name) {
+        rule.setName(ruleConfig.name);
+    }
+
+    //Register rule here
+    if (triggers &amp;&amp; triggers.length > 0) {
+        rule.setTriggers(triggers);
+        rule = registerRule(rule);
+    }
+
+    return rule;
+};
+
+let currentProvider = automationManager;
+
+let withNewRuleProvider = function(fn) {
+    let cachedRules = [];
+    currentProvider = {
+        addRule:r => {
+            //r = factory.processRule(r);
+            // r.setConfigurationDescriptions(null);
+            // r.setConfiguration(null);
+            cachedRules.push(factory.processRule(r))
+        }
+    }
+
+    try {
+        fn();
+        let provider = factory.newRuleProvider(cachedRules);
+        osgi.registerService(provider, utils.typeBySuffix('core.automation.RuleProvider').class.getName())
+    } finally {
+        currentProvider = automationManager;
+    }
+
+}
+
+let withManagedProvider = function(fn) {
+    let previousProvider = currentProvider;
+    currentProvider = automationManager;
+
+    try {
+        fn();
+    } finally {
+        currentProvider = previousProvider;
+    }
+}
+
+let registerRule = function(rule) {
+    return currentProvider.addRule(rule);
+}
+
+/**
+ * Creates a rule, with an associated SwitchItem that can be used to toggle the rule's enabled state.
+ * The rule will be created and immediately available.
+ * 
+ * @memberOf rules
+ * @param {Object} ruleConfig The rule config describing the rule
+ * @param {String} ruleConfig.name the name of the rule
+ * @param {String} ruleConfig.description a description of the rule
+ * @param {*} ruleConfig.execute callback that will be called when the rule fires
+ * @param {HostTrigger[]} ruleConfig.triggers triggers which will define when to fire the rule
+ * @param {String} ruleConfig.ruleGroup the name of the rule group to use.
+ * @returns {HostRule} the created rule
+ */
+let SwitchableJSRule = function (ruleConfig) {
+
+    if (!ruleConfig.name) {
+        throw Error("No name specified for rule!");
+    }
+
+    //first create a toggling item
+    var itemName = itemNameForRule(ruleConfig);
+
+    //then add the item
+    var item = items.replaceItem(itemName, "Switch", null, getGroupsForItem(ruleConfig), ruleConfig.description, [GENERATED_RULE_ITEM_TAG]);
+
+    //create the real rule
+    var rule = JSRule(ruleConfig);
+
+    //hook up a rule to link the item to the actual rule
+    linkItemToRule(rule, item);
+
+    if (item.isUninitialized) {
+        //possibly load item's prior state
+        let historicState = itemhistory.latestState(item);
+
+        if (historicState !== null) {
+            item.postUpdate(historicState);
         } else {
-            stackLine = msg.stack.split('\n')[1];
-        }
-
-        //pick out the call, fileName &amp; lineNumber from the specific frame
-        let match = stackLine.match(/^\s+at\s*(?&lt;caller>[^ ]*) \(?(?&lt;fileName>[^:]+):(?&lt;lineNumber>[0-9]+):[0-9]+\)?/);
-
-        if (match) {
-            Object.assign(msg, match.groups);
-        } else { //won't match an 'eval'd string, so retry
-            match = stackLine.match(/\s+at\s+\&lt;eval\>:(?&lt;lineNumber>[0-9]+):[0-9]+/)
-            if (match) {
-                Object.assign(msg, {
-                    fileName: "&lt;unknown>",
-                    caller: "&lt;root script>"
-                }, match.groups)
-            } else throw Error(`Failed to parse stack line: ${stackLine}`);
-        }
-
-        return msg;
-    }
-
-    /**
-     * Method to format a log message. Don't use directly.
-     * 
-     * @private
-     * @param {Object} msg the message to get caller details for
-     * @param {String} levelString the level being logged at
-     * @param {Number} ignoreStackDepth the number of stack frames which to ignore in calculating caller
-     * @param {String} [prefix=log] the prefix type, such as none, level, short or log.
-     * @returns {Error} message with 'message' String property
-     */
-    _formatLogMessage(msg, levelString, ignoreStackDepth, prefix = "log") {
-
-        let clazz = this;
-        let msgData = {
-            message: msg.toString(),
-            get caller() {//don't run this unless we need to, then cache it
-                this.cached = this.cached || clazz._getCallerDetails(msg, ignoreStackDepth)
-                return this.cached;
-            }
-        };
-
-        levelString = levelString.toUpperCase();
-
-        switch (prefix) {
-            case "none": return msgData.message;
-            case "level": return `[${levelString}] ${msgData.message}`
-            case "short": return `${msgData.message}\t\t[${this.name}, ${msgData.caller.fileName}:${msgData.caller.lineNumber}]`
-            case "log": return `${msgData.message}\t\t[${this.name} at source ${msgData.caller.fileName}, line ${msgData.caller.lineNumber}]`
-            default: throw Error(`Unknown prefix type ${prefix}`)
+            item.sendCommand('ON');
         }
     }
-
-    /**
-     * Logs at ERROR level.
-     * @see atLevel
-     */
-    error() { this.atLevel('error', ...arguments) }
-    /**
-     * Logs at ERROR level.
-     * @see atLevel
-     */
-    warn() { this.atLevel('warn', ...arguments) }
-    /**
-     * Logs at INFO level.
-     * @see atLevel
-     */
-    info() { this.atLevel('info', ...arguments) }
-    /**
-     * Logs at DEBUG level.
-     * @see atLevel
-     */
-    debug() { this.atLevel('debug', ...arguments) }
-    /**
-     * Logs at TRACE level.
-     * @see atLevel
-     */
-    trace() { this.atLevel('trace', ...arguments) }
-
-    /**
-     * Logs a message at the supplied level. The message may include placeholders {} which
-     * will be substituted into the message string only if the message is actually logged.
-     * 
-     * @example
-     * log.atLevel('INFO', 'The widget was created as {}', widget);
-     * 
-     * 
-     * @param {String} level The level at which to log, such as 'INFO', or 'DEBUG'
-     * @param {String|Error} msg the message to log, possibly with object placeholders
-     * @param {Object[]} [objects] the objects to substitute into the log message
-     */
-    atLevel(level, msg, ...objects) {
-        let titleCase = level[0].toUpperCase() + level.slice(1)
-        try {
-            if (this._logger[`is${titleCase}Enabled`]()) {
-
-                this.maybeLogWithThrowable(level, msg, objects) ||
-                    this.writeLogLine(level, this._formatLogMessage(msg, level, 6), objects);
-            }
-        } catch (err) {
-            this._logger.error(this._formatLogMessage(err, "error", 0));
-        }
-    }
-
-    maybeLogWithThrowable(level, msg, objects) {
-        if(objects.length === 1){
-            let obj = objects[0];
-            if((obj instanceof Error || (obj.message &amp;&amp; obj.name &amp;&amp; obj.stack)) &amp;&amp; !msg.includes("{}")) { //todo: better substitution detected
-                //log the basic message
-                this.writeLogLine(level, msg, objects);
-
-                //and log the exception
-                this.writeLogLine(level, `${obj.name} : ${obj.message}\n${obj.stack}`);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    writeLogLine(level, message, objects = []) {
-        let formatted = MessageFormatter.arrayFormat(message, objects).getMessage();
-
-        this._logger[level](formatted);
-
-        if (this.appenderProvider) {
-            let appender = this.appenderProvider(level);
-            if(appender != null) {
-                appender.logAt(level, formatted)
-            }
-        }
-    }
-
-    /**
-     * The listener function attached to this logger.
-     * @return {*} the listener function
-     */
-    get listener() { return this._listener }
-
-    /**
-     * The name of this logger
-     * @return {String} the logger name
-     */
-    get name() { return this._name }
 }
 
-let appenderForLevel = null
-//attempt to load &amp; cache appender as module
-let getAppenderForLevel = function(){
-    if(appenderForLevel === null) {
-        appenderForLevel = () => null;
+const getTriggeredData = function (input) {
+    let event = input.get('event');
 
-        try {
-            appenderForLevel = require('log_appenders').forLevel;
-        } catch(e) {
-            new Logger("log", () => null).debug("No appenders found for log", e);
+    if(event &amp;&amp; Java.typeName(event.class) === 'org.eclipse.smarthome.core.items.events.ItemCommandEvent') {
+        return {
+            eventType: "command",
+            triggerType: "ItemCommandTrigger",
+            receivedCommand: event.getItemCommand(),
+            oldState: input.get("oldState") + "",
+            newState: input.get("newState") + "",
+            itemName: event.getItemName()
         }
     }
 
-    return appenderForLevel;
-}
+    var ev = event + "";
+    //log.debug("event",ev.split("'").join("").split("Item ").join("").split(" "));
+    var evArr = [];
+    if (ev.includes("triggered")) {
+        var atmp = ev.split(" triggered "); //astro:sun:local:astroDawn#event triggered START
+        evArr = [atmp[0], "triggered", atmp[1]];
+    } else {
+        evArr = ev.split("'").join("").split("Item ").join("").split(" "); //Item 'benqth681_switch' received command ON
+    }
 
-/**
- * Creates a logger.
- * @see Logger
- * @name default
- * @param {string} name the name of the logger
- * @param {*} [_listener] an optional listener to process log events.
- * @memberof log
- */
-module.exports = function (_name, appenderProvider = getAppenderForLevel()) {
-    return new Logger(_name, appenderProvider);
-}</code></pre>
+    var d = {
+        //size: 		input.size(),
+        oldState: input.get("oldState") + "",
+        newState: input.get("newState") + "",
+        state: input.get("state") + "", //this occurs on an ItemStateUpdateTrigger
+        receivedCommand: null,
+        receivedState: null,
+        receivedTrigger: null,
+        itemName: evArr[0]
+    };
+
+    try {
+        if (event !== null &amp;&amp; event.getPayload()) {
+            d.payload = JSON.parse(event.getPayload());
+            log.debug("Extracted event payload {}", d.payload);
+        }
+    } catch (e) {
+        log.warn("Failed to extract payload: {}", e.message);
+    }
+
+    switch (evArr[1]) {
+        // case "received":
+        //     d.eventType = "command";
+        //     d.triggerType = "ItemCommandTrigger";
+        //     d.receivedCommand = input.get("command") + "";
+        //     break;
+        case "updated":
+            d.eventType = "update";
+            d.triggerType = "ItemStateUpdateTrigger";
+            d.receivedState = input.get("state") + "";
+            break;
+        case "changed":
+            d.eventType = "change";
+            d.triggerType = "ItemStateChangeTrigger";
+            break;
+        case "triggered":
+            d.eventType = "triggered";
+            d.triggerType = "ChannelEventTrigger";
+            d.receivedTrigger = evArr[2];
+            break;
+        default:
+            if (input.size() == 0) {
+                d.eventType = "time";
+                d.triggerType = "GenericCronTrigger";
+                d.triggerTypeOld = "TimerTrigger";
+            } else {
+                d.eventType = "";
+                d.triggerType = "";
+            }
+    }
+
+
+    return d;
+};
+
+module.exports = {
+    withNewRuleProvider,
+    JSRule,
+    SwitchableJSRule
+}
+ </code></pre>
         </article>
     </section>
 
@@ -277,7 +359,7 @@ module.exports = function (_name, appenderProvider = getAppenderForLevel()) {
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Mon Aug 03 2020 10:41:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 30 2020 23:36:38 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>osgi.js - Documentation</title>
+    <title>FunctionConditionConf - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -29,148 +29,191 @@
 
 <div id="main">
     
-    <h1 class="page-title">osgi.js</h1>
+    <h1 class="page-title">FunctionConditionConf</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * OSGi module.
- * This module provides access to OSGi services.
- * 
- * @namespace osgi
- */
-
-const log = require('./log')('osgi');
-const bundleContext = require('@runtime/osgi').bundleContext;
-const lifecycle = require('@runtime/osgi').lifecycle;
-const Hashtable = Java.type('java.util.Hashtable');
-
-/**
- * Map of interface names to sets of services registered (by this module)
- */
-let registeredServices = {};
-
-
-let jsObjectToHashtable = function(obj) {
-    if(obj === null) {
-        return null;
-    }
-
-    let rv = new Hashtable();
-    for(let k in obj) {
-        rv.put(k, obj[k]);
-    }
-    return rv;
-}
-
-/**
- * Gets a service registered with OSGi.
- * 
- * @private
- * @param {String|HostClass} classOrName the class of the service to get
- * @returns an instance of the service, or null if it cannot be found
- * @memberOf osgi
- */
-let lookupService = function (classOrName) {
-    if (bundleContext !== null) {
-        var classname = (typeof classOrName === "object") ? classOrName.getName() : classOrName;
-        var ref = bundleContext.getServiceReference(classname);
-        return (ref !== null) ? bundleContext.getService(ref) : null;
-    }
-}
-
-/**
- * Gets a service registered with OSGi. Allows providing multiple classes/names to try for lookup.
- * 
- * @param {Array&lt;String|HostClass>} classOrNames the class of the service to get
- * 
- * @returns an instance of the service, or null if it cannot be found
- * @throws {Error} if no services of the requested type(s) can be found
- * @memberOf osgi
- */
-let getService = function (...classOrNames) {
-
-    let rv = null;
-
-    for(let classOrName of classOrNames) {
-        try {
-            rv = lookupService(classOrName)
-        } catch(e) {}
-
-        if(typeof rv !== 'undefined' &amp;&amp; rv !== null) {
-            return rv;
-        }
-    }
-
-    throw Error(`Failed to get any services of type(s): ${classOrNames}`);
-}
-
-/**
- * Finds services registered with OSGi.
- * 
- * @param {String} className the class of the service to get
- * @param {*} [filter] an optional filter used to filter the returned services
- * @returns {Object[]} any instances of the service that can be found
- * @memberOf osgi
- */
-let findServices = function (className, filter) {
-    if (bundleContext !== null) {
-        var refs = bundleContext.getAllServiceReferences(className, filter);
-        return refs != null ? [...refs].map(ref => bundleContext.getService(ref)) : [];
-    }
-}
-
-let registerService = function(service, ...interfaceNames) {
-    lifecycle.addDisposeHook(() => unregisterService(service));
-    registerPermanentService(service, interfaceNames, null);
-}
-
-let registerPermanentService = function(service, interfaceNames, properties = null) {
+        <h2>
+            <span class="ancestors"><a href="fluent.html">fluent</a>~</span>
+        
+        FunctionConditionConf
+        </h2>
+        
+            <div class="class-description"><p>Condition that wraps a function to determine whether if passes</p></div>
+        
     
-    let registration = bundleContext.registerService(interfaceNames, service, jsObjectToHashtable(properties));
+</header>
 
-    for (let interfaceName of interfaceNames) {
-        if(typeof registeredServices[interfaceName] === 'undefined') {
-            registeredServices[interfaceName] = new Set();
-        }
-        registeredServices[interfaceName].add({service, registration});
-        log.debug("Registered service {} of as {}", service, interfaceName)
-    }
-    return registration;
-}
+<article>
+    <div class="container-overview">
+    
+        
+<div class="section-method">
 
-let unregisterService = function(serviceToUnregister) {
+    
+    <h2>Constructor</h2>
+    
 
-    log.debug("Unregistering service {}", serviceToUnregister);
+    <h4 class="name" id="FunctionConditionConf"><span class="type-signature"></span>new FunctionConditionConf<span class="signature">(fn)</span><span class="type-signature"></span></h4>
 
-    for(let interfaceName in registeredServices) {
-        let servicesForInterface = registeredServices[interfaceName];
+    
 
-        servicesForInterface.forEach(({service, registration}) => {
-            if (service == serviceToUnregister) {
-                servicesForInterface.delete({service, registration});
-                registration.unregister();
-                log.debug("Unregistered service: {}", service);
-            }
-        });
-    }
-}
 
-module.exports = {
-    getService,
-    findServices,
-    registerService,
-    registerPermanentService,
-    unregisterService
-}</code></pre>
-        </article>
-    </section>
+
+<div class="description">
+    <p>Creates a new function condition. Don't call directly.</p>
+</div>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="fluent_condition-conf.js.html">fluent/condition-conf.js</a>, <a href="fluent_condition-conf.js.html#line15">line 15</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>fn</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><code>*</code></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">
+                <p>callback which determines whether the condition passes</p>
+                
+            </td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -180,7 +223,7 @@ module.exports = {
 <br class="clear">
 
 <footer>
-    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Mon Aug 03 2020 10:41:08 GMT+0000 (Coordinated Universal Time) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Aug 30 2020 23:36:38 GMT+0000 (Coordinated Universal Time) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
