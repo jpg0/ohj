@@ -1,11 +1,11 @@
 /**
  * Log namespace.
  * This namespace provides loggers to log messages to the Openhab Log.
- *
+ * 
  * @example <caption>Basic logging</caption>
  * let log = require('ohj').log('my_logger');
  * log.info("Hello World!")
- *
+ * 
  * @namespace log
  */
 
@@ -15,20 +15,20 @@
  */
 const LOGGER_PREFIX = "script.js";
 
-const RuntimeExceptionEx = require('@runtime/osgi').classutil.extend(Java.type('java.lang.RuntimeException'));
+//const RuntimeExceptionEx = require('@runtime/osgi').classutil.extend(Java.type('java.lang.RuntimeException'));
 
 const MessageFormatter = Java.type("org.slf4j.helpers.MessageFormatter");
 
 /**
  * Logger class. A named logger providing the ability to log formatted messages.
- *
+ * 
  * @memberof log
  * @hideconstructor
  */
 class Logger {
     /**
      * Creates a new logger. Don't use directly, use {@link log} on module.
-     *
+     * 
      * @param {String} _name the name of the logger. Will be prefixed by {@link LOGGER_PREFIX}
      * @param {*} _listener a callback to receive logging calls. Can be used to send calls elsewhere, such as escalate errors.
      */
@@ -40,7 +40,7 @@ class Logger {
 
     /**
      * Method to determine caller. Don't use directly.
-     *
+     * 
      * @private
      * @param {Object} msg the message to get caller details for
      * @param {Number} ignoreStackDepth the number of stack frames which to ignore in calculating caller
@@ -68,7 +68,12 @@ class Logger {
                     fileName: "<unknown>",
                     caller: "<root script>"
                 }, match.groups)
-            }
+            } else {
+                Object.assign(msg, {
+                    fileName: "<unknown>",
+                    caller: "<root script>"
+                })
+            } //throw Error(`Failed to parse stack line: ${stackLine}`);
         }
 
         return msg;
@@ -76,7 +81,7 @@ class Logger {
 
     /**
      * Method to format a log message. Don't use directly.
-     *
+     * 
      * @private
      * @param {Object} msg the message to get caller details for
      * @param {String} levelString the level being logged at
@@ -101,7 +106,7 @@ class Logger {
             case "none": return msgData.message;
             case "level": return `[${levelString}] ${msgData.message}`
             case "short": return `${msgData.message}\t\t[${this.name}, ${msgData.caller.fileName}:${msgData.caller.lineNumber}]`
-            case "log": return `${msgData.message}\t\t[${this.name}${msgData.caller.fileName ? ` at source ${msgData.caller.fileName}, line ${msgData.caller.lineNumber}` : ''}]`
+            case "log": return `${msgData.message}\t\t[${this.name} at source ${msgData.caller.fileName}, line ${msgData.caller.lineNumber}]`
             default: throw Error(`Unknown prefix type ${prefix}`)
         }
     }
@@ -135,11 +140,11 @@ class Logger {
     /**
      * Logs a message at the supplied level. The message may include placeholders {} which
      * will be substituted into the message string only if the message is actually logged.
-     *
+     * 
      * @example
      * log.atLevel('INFO', 'The widget was created as {}', widget);
-     *
-     *
+     * 
+     * 
      * @param {String} level The level at which to log, such as 'INFO', or 'DEBUG'
      * @param {String|Error} msg the message to log, possibly with object placeholders
      * @param {Object[]} [objects] the objects to substitute into the log message
@@ -148,8 +153,9 @@ class Logger {
         let titleCase = level[0].toUpperCase() + level.slice(1)
         try {
             if (this._logger[`is${titleCase}Enabled`]()) {
+
                 this.maybeLogWithThrowable(level, msg, objects) ||
-                this.writeLogLine(level, this._formatLogMessage(msg, level, 6), objects);
+                    this.writeLogLine(level, this._formatLogMessage(msg, level, 6), objects);
             }
         } catch (err) {
             this._logger.error(this._formatLogMessage(err, "error", 0));

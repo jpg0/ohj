@@ -12,7 +12,7 @@ const ModuleBuilder = utils.typeWithFallback(
     "org.eclipse.smarthome.automation.core.util.ModuleBuilder",
     "org.openhab.core.automation.util.ModuleBuilder");
 
-const Configuration = Java.type("org.eclipse.smarthome.config.core.Configuration");
+const Configuration = Java.type("org.openhab.core.config.core.Configuration");
 
 /**
  * Creates a trigger. Internal function, instead use predefined trigger types.

@@ -10,8 +10,7 @@ describe('Conditionals', function () {
             messages, 
             mock:function(name){
                 return {
-                    error: a => messages.push(`error: ${a}`),
-                    debug: a => messages.push(`debug: ${a}`)
+                    error: a => messages.push(a)
                 }
             }
         };

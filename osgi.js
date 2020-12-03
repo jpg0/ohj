@@ -4,7 +4,7 @@
  * 
  * @namespace osgi
  */
-
+ 
 const log = require('./log')('osgi');
 const bundleContext = require('@runtime/osgi').bundleContext;
 const lifecycle = require('@runtime/osgi').lifecycle;
@@ -54,13 +54,15 @@ let lookupService = function (classOrName) {
  * @memberOf osgi
  */
 let getService = function (...classOrNames) {
-
+log.warn(`bc=${bundleContext}`);
     let rv = null;
 
     for(let classOrName of classOrNames) {
         try {
             rv = lookupService(classOrName)
-        } catch(e) {}
+        } catch(e) {
+	    log.warn(`Failed to get service ${classOrName}: {}`, e);
+	}
 
         if(typeof rv !== 'undefined' && rv !== null) {
             return rv;

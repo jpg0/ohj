@@ -6,8 +6,8 @@
  * @namespace itemshistory
  */
 
-const PersistenceExtensions = Java.type("org.eclipse.smarthome.model.persistence.extensions.PersistenceExtensions");
-const DateTime = Java.type('org.joda.time.DateTime');
+const PersistenceExtensions = Java.type("org.openhab.core.persistence.extensions.PersistenceExtensions");
+const DateTime = Java.type('java.time.ZonedDateTime');
 
 let historicState = function (item, timestamp) {
     //todo: check item param
