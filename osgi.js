@@ -54,7 +54,6 @@ let lookupService = function (classOrName) {
  * @memberOf osgi
  */
 let getService = function (...classOrNames) {
-log.warn(`bc=${bundleContext}`);
     let rv = null;
 
     for(let classOrName of classOrNames) {
