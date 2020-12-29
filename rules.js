@@ -2,7 +2,7 @@
 /**
  * Rules namespace.
  * This namespace allows creation of Openhab rules.
- * 
+ *
  * @namespace rules
  */
 
@@ -21,7 +21,7 @@ let factory = require('@runtime/rules').factory;
 
 /**
  * Generates an item name given it's configuration.
- * 
+ *
  * @memberOf rules
  * @private
  * @param {Object} ruleConfig The rule config
@@ -33,7 +33,7 @@ const itemNameForRule = function (ruleConfig) {
 
 /**
  * Links an item to a rule. When the item is switched on or off, so will the rule be.
- * 
+ *
  * @memberOf rules
  * @private
  * @param {HostRule} rule The rule to link to the item.
@@ -61,7 +61,7 @@ const linkItemToRule = function (rule, item) {
 
 /**
  * Gets the groups that an rule-toggling-item should be a member of. Will create the group item if necessary.
- * 
+ *
  * @memberOf rules
  * @private
  * @param {Object} ruleConfig The rule config describing the rule
@@ -81,17 +81,17 @@ const getGroupsForItem = function (ruleConfig) {
 
 /**
  * Creates a rule. The rule will be created and immediately available.
- * 
+ *
  * @example
  * import { rules, triggers } = require('ohj');
- * 
+ *
  * rules.JSRule({
  *  name: "my_new_rule",
  *  description": "this rule swizzles the swallows",
  *  triggers: triggers.GenericCronTrigger("0 30 16 * * ? *"),
  *  execute: triggerConfig => { //do stuff }
  * });
- * 
+ *
  * @memberOf rules
  * @param {Object} ruleConfig The rule config describing the rule
  * @param {String} ruleConfig.name the name of the rule
@@ -182,7 +182,7 @@ let registerRule = function(rule) {
 /**
  * Creates a rule, with an associated SwitchItem that can be used to toggle the rule's enabled state.
  * The rule will be created and immediately available.
- * 
+ *
  * @memberOf rules
  * @param {Object} ruleConfig The rule config describing the rule
  * @param {String} ruleConfig.name the name of the rule
@@ -267,11 +267,11 @@ const getTriggeredData = function (input) {
     }
 
     switch (evArr[1]) {
-        // case "received":
-        //     d.eventType = "command";
-        //     d.triggerType = "ItemCommandTrigger";
-        //     d.receivedCommand = input.get("command") + "";
-        //     break;
+        case "received":
+            d.eventType = "command";
+            d.triggerType = "ItemCommandTrigger";
+            d.receivedCommand = input.get("command") + "";
+            break;
         case "updated":
             d.eventType = "update";
             d.triggerType = "ItemStateUpdateTrigger";
@@ -306,4 +306,3 @@ module.exports = {
     JSRule,
     SwitchableJSRule
 }
- 
