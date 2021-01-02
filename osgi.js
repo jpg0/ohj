@@ -4,7 +4,7 @@
  * 
  * @namespace osgi
  */
-
+ 
 const log = require('./log')('osgi');
 const bundleContext = require('@runtime/osgi').bundleContext;
 const lifecycle = require('@runtime/osgi').lifecycle;
@@ -37,10 +37,17 @@ let jsObjectToHashtable = function(obj) {
  * @memberOf osgi
  */
 let lookupService = function (classOrName) {
-    if (bundleContext !== null) {
+    var bc = bundleContext;
+    if(bundleContext === undefined) {    
+        log.warn("bundleContext is undefined");
+        var FrameworkUtil = Java.type("org.osgi.framework.FrameworkUtil");
+        var _bundle = FrameworkUtil.getBundle(scriptExtension.class);
+        bc = (_bundle !== null) ? _bundle.getBundleContext() : null;
+    }
+    if (bc !== null) {
         var classname = (typeof classOrName === "object") ? classOrName.getName() : classOrName;
-        var ref = bundleContext.getServiceReference(classname);
-        return (ref !== null) ? bundleContext.getService(ref) : null;
+        var ref = bc.getServiceReference(classname);
+        return (ref !== null) ? bc.getService(ref) : null;
     }
 }
 
@@ -54,13 +61,14 @@ let lookupService = function (classOrName) {
  * @memberOf osgi
  */
 let getService = function (...classOrNames) {
-
     let rv = null;
 
     for(let classOrName of classOrNames) {
         try {
             rv = lookupService(classOrName)
-        } catch(e) {}
+        } catch(e) {
+	    log.warn(`Failed to get service ${classOrName}: {}`, e);
+	}
 
         if(typeof rv !== 'undefined' && rv !== null) {
             return rv;

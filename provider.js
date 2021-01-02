@@ -16,7 +16,7 @@ function getAllFunctionNames(obj) {
 class AbstractProvider {
     constructor(type) {
         this.typeName = type.class.getName();
-        this.javaType = require('@runtime/osgi').classutil.extend(type);
+        this.javaType = Java.extend(type);//require('@runtime/osgi').classutil.extend(type);
     }
 
     register() {

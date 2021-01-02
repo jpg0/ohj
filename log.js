@@ -15,7 +15,7 @@
  */
 const LOGGER_PREFIX = "script.js";
 
-const RuntimeExceptionEx = require('@runtime/osgi').classutil.extend(Java.type('java.lang.RuntimeException'));
+//const RuntimeExceptionEx = require('@runtime/osgi').classutil.extend(Java.type('java.lang.RuntimeException'));
 
 const MessageFormatter = Java.type("org.slf4j.helpers.MessageFormatter");
 
@@ -68,7 +68,12 @@ class Logger {
                     fileName: "<unknown>",
                     caller: "<root script>"
                 }, match.groups)
-            } else throw Error(`Failed to parse stack line: ${stackLine}`);
+            } else {
+                Object.assign(msg, {
+                    fileName: "<unknown>",
+                    caller: "<root script>"
+                })
+            } //throw Error(`Failed to parse stack line: ${stackLine}`);
         }
 
         return msg;

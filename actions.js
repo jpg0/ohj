@@ -21,7 +21,7 @@ const utils = require('./utils');
 const { actions } = require('@runtime/Defaults');
 const log = require('./log')('actions');
 
-const Things = utils.typeBySuffix('model.script.actions.Things');
+const Things = utils.typeBySuffix('core.model.script.actions.Things');
 
 const oh1_actions = osgi.findServices("org.openhab.core.scriptengine.action.ActionService", null) || [];
 const oh2_actions = osgi.findServices("org.eclipse.smarthome.model.script.engine.action.ActionService", null) || [];
@@ -37,7 +37,7 @@ oh1_actions.concat(oh2_actions).forEach(function (item) {
 
 let Exec = utils.typeWithFallback('org.openhab.core.model.script.actions.Exec', 'org.eclipse.smarthome.model.script.actions.Exec');
 let HTTP = utils.typeWithFallback('org.openhab.core.model.script.actions.HTTP', 'org.eclipse.smarthome.model.script.actions.HTTP');
-let LogAction = utils.typeWithFallback('org.openhab.core.model.script.actions.LogAction', 'org.eclipse.smarthome.model.script.actions.LogAction');
+let LogAction = utils.typeWithFallback('org.openhab.core.model.script.actions.Log', 'org.eclipse.smarthome.model.script.actions.LogAction');
 let Ping = utils.typeWithFallback('org.openhab.core.model.script.actions.Ping', 'org.eclipse.smarthome.model.script.actions.Ping');
 
 [Exec, HTTP, LogAction, Ping].forEach(function (item) {
