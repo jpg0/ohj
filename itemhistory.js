@@ -9,7 +9,8 @@
 const utils = require('./utils');
 
 const PersistenceExtensions = utils.typeBySuffix("model.persistence.extensions.PersistenceExtensions");
-const Instant = Java.type('java.time.Instant');
+
+const timeClazz = utils.typeWithFallback("org.joda.time.DateTime", "java.time.Instant"); //remove JodaTime when remove support for OH 2.5.x
 
 let historicState = function (item, timestamp) {
     //todo: check item param
@@ -24,7 +25,7 @@ let previousState = function(item, skipEqual = false) {
     return result === null ? null : result.state;
 }
 
-let latestState = (item) => historicState(item, Instant.now());
+let latestState = (item) => historicState(item, timeClazz.now());
 
 module.exports = {
     historicState,

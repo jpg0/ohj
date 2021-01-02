@@ -1,11 +1,13 @@
-const JavaThingBuilder = Java.type('org.openhab.core.thing.binding.builder.ThingBuilder');
-const ThingTypeUID = Java.type('org.openhab.core.thing.ThingTypeUID');
-const JavaChannelBuilder = Java.type('org.openhab.core.thing.binding.builder.ChannelBuilder');
-const ChannelUID = Java.type('org.openhab.core.thing.ChannelUID');
-const ThingUID = Java.type('org.openhab.core.thing.ThingUID');
-const ChannelKind = Java.type('org.openhab.core.thing.type.ChannelKind');
-const ChannelTypeUID = Java.type('org.openhab.core.thing.type.ChannelTypeUID');
-const Configuration = Java.type('org.openhab.core.config.core.Configuration');
+const utils = require('./utils');
+
+const JavaThingBuilder = utils.typeBySuffix('core.thing.binding.builder.ThingBuilder');
+const ThingTypeUID = utils.typeBySuffix('core.thing.ThingTypeUID');
+const JavaChannelBuilder = utils.typeBySuffix('core.thing.binding.builder.ChannelBuilder');
+const ChannelUID = utils.typeBySuffix('core.thing.ChannelUID');
+const ThingUID = utils.typeBySuffix('core.thing.ThingUID');
+const ChannelKind = utils.typeBySuffix('core.thing.type.ChannelKind');
+const ChannelTypeUID = utils.typeBySuffix('core.thing.type.ChannelTypeUID');
+const Configuration = utils.typeBySuffix('core.config.core.Configuration');
 
 class OHThing {
     constructor(rawThing) {
