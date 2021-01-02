@@ -37,10 +37,17 @@ let jsObjectToHashtable = function(obj) {
  * @memberOf osgi
  */
 let lookupService = function (classOrName) {
-    if (bundleContext !== null) {
+    var bc = bundleContext;
+    if(bundleContext === undefined) {    
+        log.warn("bundleContext is undefined");
+        var FrameworkUtil = Java.type("org.osgi.framework.FrameworkUtil");
+        var _bundle = FrameworkUtil.getBundle(scriptExtension.class);
+        bc = (_bundle !== null) ? _bundle.getBundleContext() : null;
+    }
+    if (bc !== null) {
         var classname = (typeof classOrName === "object") ? classOrName.getName() : classOrName;
-        var ref = bundleContext.getServiceReference(classname);
-        return (ref !== null) ? bundleContext.getService(ref) : null;
+        var ref = bc.getServiceReference(classname);
+        return (ref !== null) ? bc.getService(ref) : null;
     }
 }
 
