@@ -1,4 +1,3 @@
-
 /**
  * Rules namespace.
  * This namespace allows creation of Openhab rules.
@@ -97,7 +96,7 @@ const getGroupsForItem = function (ruleConfig) {
  * @param {String} ruleConfig.name the name of the rule
  * @param {String} ruleConfig.description a description of the rule
  * @param {*} ruleConfig.execute callback that will be called when the rule fires
- * @param {HostTrigger[]} ruleConfig.triggers triggers which will define when to fire the rule
+ * @param {HostTrigger|HostTrigger[]} ruleConfig.triggers triggers which will define when to fire the rule
  * @returns {HostRule} the created rule
  */
 let JSRule = function (ruleConfig) {
@@ -116,12 +115,15 @@ let JSRule = function (ruleConfig) {
         }
     };
 
-    var rule = new SimpleRule({
+    let rule = new SimpleRule({
         execute: doExecute,
         getUID: () => ruid
     });
 
-    var triggers = ruleConfig.triggers ? ruleConfig.triggers : ruleConfig.getEventTrigger();
+    let triggers = ruleConfig.triggers ? ruleConfig.triggers : ruleConfig.getEventTrigger();
+    if (!Array.isArray(triggers)) {
+        triggers = [triggers];
+    }
 
     rule.setTemplateUID(ruTemplateid);
 
