@@ -8,7 +8,7 @@
 
 const utils = require('./utils');
 
-const PersistenceExtensions = utils.typeBySuffix("model.persistence.extensions.PersistenceExtensions");
+const PersistenceExtensions = utils.typeBySuffix("persistence.extensions.PersistenceExtensions");
 
 const timeClazz = utils.typeWithFallback("org.joda.time.DateTime", "java.time.Instant"); //remove JodaTime when remove support for OH 2.5.x
 

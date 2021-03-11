@@ -1,4 +1,4 @@
-const utils = require('./utils');
+const utils = require('../utils');
 
 const JavaThingBuilder = utils.typeBySuffix('core.thing.binding.builder.ThingBuilder');
 const ThingTypeUID = utils.typeBySuffix('core.thing.ThingTypeUID');

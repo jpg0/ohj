@@ -59,6 +59,7 @@ class CallbackProvider extends AbstractProvider {
     }
 
     getAll(){
+        log.debug(`Providing ${utils.jsArrayToJavaList(this.callbacks.flatMap(c => c())).length} for ${this.typeName}`)
         return utils.jsArrayToJavaList(this.callbacks.flatMap(c => c()));
     }
 }
