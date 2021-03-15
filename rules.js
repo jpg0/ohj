@@ -17,7 +17,6 @@ const triggers = require('./triggers');
 const { automationManager } = require('@runtime/RuleSupport');
 
 let RuleManager = osgi.getService("org.openhab.core.automation.RuleManager","org.eclipse.smarthome.automation.RuleManager");
-let factory = require('@runtime/rules').factory;
 
 /**
  * Generates an item name given it's configuration.
@@ -142,27 +141,6 @@ let JSRule = function (ruleConfig) {
 };
 
 let currentProvider = automationManager;
-
-let withNewRuleProvider = function(fn) {
-    let cachedRules = [];
-    currentProvider = {
-        addRule:r => {
-            //r = factory.processRule(r);
-            // r.setConfigurationDescriptions(null);
-            // r.setConfiguration(null);
-            cachedRules.push(factory.processRule(r))
-        }
-    }
-
-    try {
-        fn();
-        let provider = factory.newRuleProvider(cachedRules);
-        osgi.registerService(provider, utils.typeBySuffix('core.automation.RuleProvider').class.getName())
-    } finally {
-        currentProvider = automationManager;
-    }
-
-}
 
 let withManagedProvider = function(fn) {
     let previousProvider = currentProvider;
@@ -302,7 +280,6 @@ const getTriggeredData = function (input) {
 };
 
 module.exports = {
-    withNewRuleProvider,
     JSRule,
     SwitchableJSRule
 }
