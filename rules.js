@@ -238,7 +238,7 @@ const getTriggeredData = function (input) {
     try {
         if (event !== null && event.getPayload()) {
             d.payload = JSON.parse(event.getPayload());
-            log.debug("Extracted event payload {}", d.payload);
+            log.debug("Extracted event payload {}", JSON.stringify(d.payload));
         }
     } catch (e) {
         log.warn("Failed to extract payload: {}", e.message);
