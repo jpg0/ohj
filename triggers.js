@@ -149,4 +149,5 @@ module.exports = {
             "state": state
     })
     */
+   createTrigger,
 }
