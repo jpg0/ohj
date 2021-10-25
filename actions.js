@@ -25,8 +25,8 @@ const Things = utils.typeBySuffix('core.model.script.actions.Things');
 
 const oh1_actions = osgi.findServices("org.openhab.core.scriptengine.action.ActionService", null) || [];
 const oh2_actions = osgi.findServices("org.eclipse.smarthome.model.script.engine.action.ActionService", null) || [];
-
-oh1_actions.concat(oh2_actions).forEach(function (item) {
+const oh3_actions = osgi.findServices("org.openhab.core.model.script.engine.action.ActionService", null) || [];
+[...oh1_actions, ...oh2_actions, ...oh3_actions].forEach(function (item) {
     try {
         //if an action fails to activate, then warn and continue so that other actions are available
         exports[item.getActionClass().getSimpleName()] = item.getActionClass().static;

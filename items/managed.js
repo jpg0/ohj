@@ -433,6 +433,15 @@ const getItemsByTag = (...tagNames) => {
     return utils.javaSetToJsArray(itemRegistry.getItemsByTag(tagNames)).map(i => new OHItem(i));
 }
 
+/**
+ * Gets all Openhab Items.
+ * @return {OHItem[]} all items
+ * @alias module:ohj/items.getItems
+ */
+ const getItems = () => {
+    return utils.javaSetToJsArray(itemRegistry.getItems()).map(i => new OHItem(i));
+}
+
     /**
      * Helper function to ensure an item name is valid. All invalid characters are replaced with an underscore.
      * @param {String} s the name to make value
