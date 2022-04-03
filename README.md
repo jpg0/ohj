@@ -1,3 +1,7 @@
+# This repo is now archived, as it has been merged into OpenHAB: https://github.com/openhab/openhab-js/
+
+---
+
 [![Build Status](https://travis-ci.org/jpg0/ohj.svg?branch=master)](https://travis-ci.org/jpg0/ohj)
 # Openhab Javascript Library
 
